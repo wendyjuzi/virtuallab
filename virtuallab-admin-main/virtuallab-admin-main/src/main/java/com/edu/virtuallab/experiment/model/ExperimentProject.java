@@ -1,0 +1,147 @@
+package com.edu.virtuallab.experiment.model;
+
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+import java.util.Date;
+import java.time.LocalDateTime;
+
+@Data
+@TableName("experiment_project")
+public class ExperimentProject {
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    private String name;
+    private String category;
+    private String description;
+    private String level;
+    private String imageUrl;
+    private String videoUrl;
+    @TableField("collaboration_type")
+    private String projectType; // 值可能是 "personal" 或 "team"
+    private String principle;
+    private String purpose;
+    private String method;
+    private String steps;
+    public String getSteps() {
+        return steps;
+    }
+
+    public void setSteps(String steps) {
+        this.steps = steps;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getPrinciple() {
+        return principle;
+    }
+
+    public void setPrinciple(String principle) {
+        this.principle = principle;
+    }
+
+
+    private String createdBy; // 教师用户名
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
+    // 新增审核字段
+    private String auditStatus; // 审核状态: draft/pending/approved/rejected
+    private String auditComment; // 审核意见
+    private Long auditorId; // 审核人ID
+    private LocalDateTime auditTime; // 审核时间
+    private String publishStatus; // 发布状态: unpublished/published
+    private LocalDateTime publishTime; // 发布时间
+
+    private String screenshot; // 实验截图（base64或url）
+    private String sceneData; // 3D场景JSON
+    private String experimentParams; // 参数JSON
+    private String sceneJsonPath;
+    public String getSceneJsonPath() { return sceneJsonPath; }
+    public void setSceneJsonPath(String sceneJsonPath) { this.sceneJsonPath = sceneJsonPath; }
+
+    @TableField(exist = false)
+    private String config; // three.js参数(JSON字符串)
+    @TableField(exist = false)
+    private Long creatorId;
+    @TableField(exist = false)
+    private String creatorRole; // "ADMIN" or "TEACHER"
+    @TableField(exist = false)
+    private String status; // "DRAFT", "PENDING_APPROVAL", "APPROVED", "REJECTED", "PUBLISHED"
+    @TableField(exist = false)
+    private String approveComment;
+    @TableField(exist = false)
+    private Date createTime;
+    @TableField(exist = false)
+    private Date updateTime;
+
+    // getter & setter
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getLevel() { return level; }
+    public void setLevel(String level) { this.level = level; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getVideoUrl() { return videoUrl; }
+    public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
+
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+    public String getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(String projectType) {
+        this.projectType = projectType;
+    }
+
+
+    public String getConfig() { return config; }
+    public void setConfig(String config) { this.config = config; }
+    public Long getCreatorId() { return creatorId; }
+    public void setCreatorId(Long creatorId) { this.creatorId = creatorId; }
+    public String getCreatorRole() { return creatorRole; }
+    public void setCreatorRole(String creatorRole) { this.creatorRole = creatorRole; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getApproveComment() { return approveComment; }
+    public void setApproveComment(String approveComment) { this.approveComment = approveComment; }
+    public Date getCreateTime() { return createTime; }
+    public void setCreateTime(Date createTime) { this.createTime = createTime; }
+    public Date getUpdateTime() { return updateTime; }
+    public void setUpdateTime(Date updateTime) { this.updateTime = updateTime; }
+}

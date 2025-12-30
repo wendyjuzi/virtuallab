@@ -1,0 +1,85 @@
+package com.edu.virtuallab.experiment.dao;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.edu.virtuallab.experiment.model.ExperimentReport;
+import org.apache.ibatis.annotations.*;
+import org.springframework.security.core.parameters.P;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Mapper
+public interface ExperimentReportDao extends BaseMapper<ExperimentReport> {
+    @Select("SELECT * FROM experiment_report WHERE session_id = #{sessionId}")
+    @Results(id = "reportMap", value = {
+            @Result(column = "session_id", property = "sessionId"),
+            @Result(column = "student_id", property = "studentId"),
+            @Result(column = "project_id", property = "projectId"),
+            @Result(column = "manual_content", property = "manualContent"),
+            @Result(column = "created_at", property = "createdAt"),
+            @Result(column = "updated_at", property = "updatedAt"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "principle", property = "principle"),
+            @Result(column = "purpose", property = "purpose"),
+            @Result(column = "category", property = "category"),
+            @Result(column = "method", property = "method"),
+            @Result(column = "steps", property = "steps"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "attachment_path", property = "attachmentPath"),
+            @Result(column = "original_filename", property = "originalFilename"),
+            @Result(column = "file_size", property = "fileSize"),
+            @Result(column = "mime_type", property = "mimeType"),
+            @Result(column = "comment", property = "comment"),
+            @Result(column = "score", property = "score")
+    })
+    ExperimentReport findBySessionId(@Param("sessionId") String sessionId);
+
+    @Update("UPDATE experiment_report SET manual_content = #{content}, status = 'SAVED', updated_at = NOW() WHERE session_id = #{sessionId}")
+    int updateManualContent(@Param("sessionId") String sessionId,
+                            @Param("content") String content,
+                            @Param("status") ExperimentReport.Status status
+    );
+
+    @Update("UPDATE experiment_report SET " +
+            "attachment_path='', original_filename='', " +
+            "file_size=0, mime_type='', updated_at=now() " +
+            "WHERE session_id=#{sessionId}")
+    void deleteAttachment(String sessionId);
+
+    @Update("UPDATE experiment_report SET status = 'SUBMITTED', updated_at = NOW() WHERE session_id = #{sessionId} AND status IN ('DRAFT', 'SAVED')")
+    int submitBySessionId(@Param("sessionId") String sessionId,
+                          @Param("status") ExperimentReport.Status status
+    );
+
+    @Select("SELECT * FROM experiment_report WHERE student_id = #{studentId} ORDER BY updated_at DESC")
+    @ResultMap("reportMap")
+    List<ExperimentReport> findByStudentId(@Param("studentId")Long studentId);
+
+    @Select("SELECT * FROM experiment_report WHERE status IN ('SUBMITTED', 'GRADED')")
+    List<ExperimentReport> findSubmittedAndGradedReports();
+
+    int updateManualScore(@Param("sessionId") String sessionId,
+                          @Param("score") BigDecimal score,
+                          @Param("comment") String comment);
+    ExperimentReport getManualScoreBySessionId(@Param("sessionId") String sessionId);
+    boolean deleteManualScore(@Param("sessionId") String sessionId);
+
+    @Select("SELECT * FROM experiment_report WHERE student_id = #{studentId} AND status = #{status}")
+    List<ExperimentReport> findByStudentIdAndStatus(@Param("studentId") Long studentId,
+                                                    @Param("status") ExperimentReport.Status status);
+    @Insert({
+            "<script>",
+            "INSERT INTO experiment_report",
+            "(session_id, student_id, project_id, status, principle, purpose, ",
+            "category, method, steps, description, title, created_at, updated_at)",
+            "VALUES ",
+            "<foreach collection='list' item='report' separator=','>",
+            "(#{report.sessionId}, #{report.studentId}, #{report.projectId}, #{report.status}, ",
+            "#{report.principle}, #{report.purpose}, #{report.category}, #{report.method}, ",
+            "#{report.steps}, #{report.description}, #{report.title}, ",
+            "#{report.createdAt}, #{report.updatedAt})",
+            "</foreach>",
+            "</script>"
+    })
+    void batchInsertReports(@Param("list") List<ExperimentReport> reports);
+}

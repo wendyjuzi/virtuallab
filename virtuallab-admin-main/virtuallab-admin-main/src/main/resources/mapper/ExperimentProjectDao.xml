@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.edu.virtuallab.experiment.dao.ExperimentProjectDao">
+
+    <!-- 插入实验项目 -->
+<!--    <insert id="insert" parameterType="com.edu.virtuallab.experiment.model.ExperimentProject">-->
+<!--        INSERT INTO experiment_project-->
+<!--        (name, category, description, level, image_url, video_url, created_at, updated_at)-->
+<!--        VALUES-->
+<!--            (#{name}, #{category}, #{description}, #{level}, #{imageUrl}, #{videoUrl}, NOW(), NOW())-->
+<!--    </insert>-->
+
+    <!-- 更新实验项目 -->
+    <update id="update" parameterType="com.edu.virtuallab.experiment.model.ExperimentProject">
+        UPDATE experiment_project
+        SET
+            name = #{name},
+            category = #{category},
+            description = #{description},
+            level = #{level},
+            image_url = #{imageUrl},
+            video_url = #{videoUrl},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除实验项目 -->
+    <delete id="delete" parameterType="long">
+        DELETE FROM experiment_project WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查找 -->
+    <select id="selectById" parameterType="long" resultType="com.edu.virtuallab.experiment.model.ExperimentProject">
+        SELECT * FROM experiment_project WHERE id = #{id}
+    </select>
+
+    <!-- 查询全部 -->
+    <select id="selectAll" resultType="com.edu.virtuallab.experiment.model.ExperimentProject">
+        SELECT * FROM experiment_project
+    </select>
+
+    <!-- 多条件搜索 -->
+    <select id="search" resultType="com.edu.virtuallab.experiment.model.ExperimentProject" parameterType="map">
+        SELECT * FROM experiment_project
+        WHERE 1=1
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+        <if test="level != null and level != ''">
+            AND level = #{level}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.edu.virtuallab.experiment.model.ExperimentProject"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO experiment_project
+        (
+            name, category, description, principle, purpose, method, steps,
+            level, image_url, video_url, collaboration_type,
+            created_at, updated_at, created_by,
+            screenshot, scene_data, experiment_params, scene_json_path
+        )
+        VALUES
+            (
+                #{name}, #{category}, #{description}, #{principle}, #{purpose}, #{method}, #{steps},
+                #{level}, #{imageUrl}, #{videoUrl}, #{projectType},
+                NOW(), NOW(), #{createdBy},
+                #{screenshot},
+                <if test="sceneData != null and sceneData != ''">
+                  #{sceneData}
+                </if>
+                <if test="sceneData == null or sceneData == ''">
+                  null
+                </if>,
+                #{experimentParams}, #{sceneJsonPath}
+            )
+    </insert>
+
+
+
+    <select id="getProjectsByCreatedBy" resultType="com.edu.virtuallab.experiment.model.ExperimentProject">
+        SELECT * FROM experiment_project
+        WHERE created_by = #{createdBy}
+    </select>
+
+    <select id="listPage" resultType="com.edu.virtuallab.experiment.model.ExperimentProject">
+        SELECT * FROM experiment_project
+        WHERE 1=1
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+        <choose>
+            <when test="sort == 'latest'">
+                ORDER BY created_at DESC
+            </when>
+            <when test="sort == 'popular'">
+                ORDER BY views DESC
+            </when>
+            <otherwise>
+                ORDER BY id DESC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{size}
+    </select>
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*) FROM experiment_project
+        WHERE 1=1
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+    </select>
+<!--    <select id="getTeamsByStudentId" resultType="com.edu.virtuallab.experiment.model.ExperimentProject">-->
+<!--        SELECT ep.*-->
+<!--        FROM experiment_project ep-->
+<!--                 JOIN project_team pt ON pt.project_id = ep.id-->
+<!--                 JOIN project_team_member ptm ON pt.id = ptm.team_id-->
+<!--        WHERE ptm.student_id = #{studentId}-->
+<!--    </select>-->
+    <select id="getTeamsByStudentId" resultType="Long">
+        SELECT pt.id
+        FROM project_team pt
+                 JOIN project_team_member ptm ON pt.id = ptm.team_id
+        WHERE ptm.student_id = #{studentId}
+    </select>
+
+
+    <select id="getStudentIdByUserId" resultType="long">
+        SELECT student_id FROM user WHERE id = #{userId}
+    </select>
+
+    <update id="updateStatusToInProgress" parameterType="map">
+        UPDATE student_project_progress
+        SET status = 'in_progress'
+        WHERE project_id = #{projectId}
+          AND student_id = #{studentId}
+          AND EXISTS (
+            SELECT 1 FROM experiment_project
+            WHERE id = #{projectId}
+              AND created_by != 'admin'
+        )
+    </update>
+    <!-- 更新 status 为 completed -->
+    <update id="updateStatusToCompleted" parameterType="map">
+        UPDATE student_project_progress
+        SET status = 'completed'
+        WHERE project_id = #{projectId}
+          AND student_id = #{studentId}
+          AND EXISTS (
+            SELECT 1 FROM experiment_project
+            WHERE id = #{projectId}
+              AND created_by != 'admin'
+    </update>
+    <select id="countPendingGradingReports" resultType="int">
+        SELECT COUNT(*)
+        FROM experiment_report
+        WHERE teacher_name = #{teacherName}
+          AND status = 'SUBMITTED'
+    </select>
+    <select id="getScoresByProjectId" parameterType="long" resultType="int">
+        SELECT score
+        FROM experiment_report
+        WHERE project_id = #{projectId}
+          AND score IS NOT NULL
+    </select>
+    <update id="updateProject">
+        UPDATE experiment_project
+        SET
+            name = #{name},
+            description = #{description},
+            principle = #{principle},
+            purpose = #{purpose},
+            method = #{method},
+            steps = #{steps},
+            category = #{category},
+            level = #{level},
+            collaboration_type = #{projectType},
+            image_url = #{imageUrl},
+            video_url = #{videoUrl},
+            screenshot = #{screenshot},
+            scene_data = #{sceneData},
+            experiment_params = #{experimentParams},
+            scene_json_path = #{sceneJsonPath}
+        WHERE id = #{id}
+    </update>
+    <select id="findById" resultType="com.edu.virtuallab.experiment.model.ExperimentProject">
+        SELECT * FROM experiment_project WHERE id = #{id}
+    </select>
+
+
+    <select id="listPageWithSort" resultType="com.edu.virtuallab.experiment.model.ExperimentProject">
+        SELECT
+        p.*,
+        COALESCE(l.like_count, 0) AS like_count,
+        COALESCE(f.favorite_count, 0) AS favorite_count,
+        COALESCE(l.like_count, 0) + COALESCE(f.favorite_count, 0) AS hot_count
+        FROM experiment_project p
+        LEFT JOIN (
+        SELECT resource_id, COUNT(*) AS like_count
+        FROM resource_like
+        GROUP BY resource_id
+        ) l ON p.id = l.resource_id
+        LEFT JOIN (
+        SELECT resource_id, COUNT(*) AS favorite_count
+        FROM resource_favorite
+        GROUP BY resource_id
+        ) f ON p.id = f.resource_id
+        WHERE p.created_by IN
+        <foreach item="username" collection="adminUsernames" open="(" separator="," close=")">
+            #{username}
+        </foreach>
+        <if test="category != null and category != ''">
+            AND p.category = #{category}
+        </if>
+        <if test="level != null and level != ''">
+            AND p.level = #{level}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (p.name LIKE CONCAT('%', #{keyword}, '%') OR p.description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY
+        <choose>
+            <when test="sort == 'hot'">
+                hot_count DESC
+            </when>
+            <when test="sort == 'newest'">
+                p.updated_at DESC
+            </when>
+            <when test="sort == 'likes'">
+                like_count DESC
+            </when>
+            <when test="sort == 'favorites'">
+                favorite_count DESC
+            </when>
+            <otherwise>
+                p.updated_at DESC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countWithSort" resultType="long">
+        SELECT COUNT(*)
+        FROM experiment_project p
+        WHERE p.created_by IN
+        <foreach item="username" collection="adminUsernames" open="(" separator="," close=")">
+            #{username}
+        </foreach>
+        <if test="category != null and category != ''">
+            AND p.category = #{category}
+        </if>
+        <if test="level != null and level != ''">
+            AND p.level = #{level}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (p.name LIKE CONCAT('%', #{keyword}, '%') OR p.description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+    <select id="countByType" resultType="com.edu.virtuallab.experiment.dto.NameValueDTO">
+      SELECT category AS name, COUNT(*) AS value
+      FROM experiment_project
+      GROUP BY category
+    </select>
+
+    <select id="countActiveByDay" resultType="com.edu.virtuallab.experiment.dto.NameValueDTO">
+      SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS name, COUNT(*) AS value
+      FROM experiment_project
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+      GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d')
+      ORDER BY name
+    </select>
+
+    <select id="rankByFinishRate" resultType="com.edu.virtuallab.experiment.dto.NameValueDTO">
+      SELECT p.name AS name,
+             ROUND(SUM(CASE WHEN pr.progress = 'completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS value
+      FROM experiment_project p
+      JOIN project_progress pr ON p.id = pr.project_id
+      GROUP BY p.id, p.name
+      ORDER BY value DESC
+      LIMIT 5
+    </select>
+
+    <select id="topByParticipants" resultType="com.edu.virtuallab.experiment.dto.NameValueDTO">
+      SELECT p.name AS name, COUNT(DISTINCT pr.student_id) AS value
+      FROM experiment_project p
+      JOIN project_progress pr ON p.id = pr.project_id
+      GROUP BY p.id, p.name
+      ORDER BY value DESC
+      LIMIT 5
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM experiment_project
+    </select>
+</mapper>

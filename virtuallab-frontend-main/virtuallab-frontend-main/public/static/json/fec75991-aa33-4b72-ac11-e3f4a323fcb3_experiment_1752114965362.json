@@ -1,0 +1,44 @@
+{
+  "name": "默认场景",
+  "experimentName": "",
+  "subject": "physics",
+  "experimentParams": {
+    "gravity": 9.8,
+    "friction": 0.3,
+    "elasticity": 0.8,
+    "simulationSpeed": 1
+  },
+  "experimentDesc": "",
+  "experimentDifficulty": "medium",
+  "targetGrades": [],
+  "experimentTags": "",
+  "objects": [
+    {
+      "type": "Mesh",
+      "name": "球体_1752114958974",
+      "geometry": "SphereGeometry",
+      "material": {
+        "color": "ff0000",
+        "opacity": 1,
+        "transparent": false
+      },
+      "position": [
+        0,
+        0.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        "XYZ"
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "exportTime": "2025-07-10T02:36:05.361Z"
+}

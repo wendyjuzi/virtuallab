@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.virtuallab.resource.dao.ResourceDao">
+    <insert id="insert" parameterType="com.edu.virtuallab.resource.model.Resource">
+        INSERT INTO experiment_project (name, category, description, level, image_url, video_url, created_at, updated_at, audit_status, publish_status, created_by)
+        VALUES (#{name}, #{category}, #{description}, #{level}, #{imageUrl}, #{videoUrl}, NOW(), NOW(), 'draft', 'unpublished', #{createdBy})
+    </insert>
+
+    <update id="update" parameterType="com.edu.virtuallab.resource.model.Resource">
+        UPDATE experiment_project
+        SET name = #{name},
+            category = #{category},
+            description = #{description},
+            level = #{level},
+            image_url = #{imageUrl},
+            video_url = #{videoUrl},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM experiment_project WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" parameterType="long" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByType" parameterType="string" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        WHERE level = #{type}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByCategory" parameterType="string" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        WHERE category = #{category}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByStatus" parameterType="string" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        WHERE publish_status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByUploader" parameterType="string" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        WHERE created_by = #{uploader}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="searchByName" parameterType="string" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByTypeAndCategory" resultType="com.edu.virtuallab.resource.model.Resource">
+        SELECT id, name, category, description, level, image_url as imageUrl, video_url as videoUrl, 
+               created_at as createdAt, updated_at as updatedAt, audit_status as auditStatus, publish_status as publishStatus, created_by as createdBy
+        FROM experiment_project
+        <where>
+            <if test="type != null and type != ''">
+                AND level = #{type}
+            </if>
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 统计各类资源的使用次数 -->
+    <select id="countResourceUsage" resultType="map">
+        SELECT type as name, COUNT(id) as value
+        FROM resource
+        GROUP BY type
+    </select>
+    <!-- 统计资源评分分布 -->
+    <select id="countResourceRatingHistogram" resultType="int">
+        SELECT rating
+        FROM resource_rating
+    </select>
+    <!-- 统计资源下载趋势（近7天） -->
+    <select id="countResourceDownloadTrend" resultType="int">
+        SELECT COUNT(*)
+        FROM resource_download
+        WHERE download_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY DATE(download_time)
+    </select>
+    <!-- 统计热门资源标签 -->
+    <select id="countResourceTags" resultType="map">
+        SELECT tag as name, COUNT(*) as value
+        FROM resource_tag
+        GROUP BY tag
+        ORDER BY value DESC
+        LIMIT 20
+    </select>
+</mapper> 
