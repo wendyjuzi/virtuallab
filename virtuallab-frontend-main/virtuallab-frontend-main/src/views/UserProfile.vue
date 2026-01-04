@@ -1,12 +1,21 @@
-
 <template>
   <div class="user-profile-container sysadmin-frosted-bg">
+    <div class="back-button-container">
+      <button class="back-button" @click="goBack">
+        <i class="back-icon">←</i>
+        返回
+      </button>
+    </div>
     <div class="header-glass sysadmin-glass profile-header">
       <div class="profile-lottie" ref="userLottieRef"></div>
       <div class="profile-info">
-        <h1 class="profile-name">{{ userStore.user?.username || '用户' }}</h1>
-        <p class="profile-role">{{ getRoleName(userStore.user?.roles?.[0] || '') }}</p>
-        <p class="profile-email">{{ (userStore.user as any)?.email || '暂无邮箱' }}</p>
+        <h1 class="profile-name">{{ userStore.user?.username || "用户" }}</h1>
+        <p class="profile-role">
+          {{ getRoleName(userStore.user?.roles?.[0] || "") }}
+        </p>
+        <p class="profile-email">
+          {{ (userStore.user as any)?.email || "暂无邮箱" }}
+        </p>
       </div>
     </div>
 
@@ -20,12 +29,23 @@
                 <span>基本信息</span>
               </div>
             </template>
-            <el-form :model="userForm" :rules="userRules" ref="userFormRef" label-width="100px">
+            <el-form
+              :model="userForm"
+              :rules="userRules"
+              ref="userFormRef"
+              label-width="100px"
+            >
               <el-form-item label="用户名" prop="username">
-                <el-input v-model="userForm.username" placeholder="请输入用户名" />
+                <el-input
+                  v-model="userForm.username"
+                  placeholder="请输入用户名"
+                />
               </el-form-item>
               <el-form-item label="真实姓名" prop="realName">
-                <el-input v-model="userForm.realName" placeholder="请输入真实姓名" />
+                <el-input
+                  v-model="userForm.realName"
+                  placeholder="请输入真实姓名"
+                />
               </el-form-item>
               <el-form-item label="邮箱" prop="email">
                 <el-input v-model="userForm.email" placeholder="请输入邮箱" />
@@ -34,16 +54,27 @@
                 <el-input v-model="userForm.phone" placeholder="请输入手机号" />
               </el-form-item>
               <el-form-item label="学号/工号" prop="studentId">
-                <el-input v-model="userForm.studentId" placeholder="请输入学号或工号" />
+                <el-input
+                  v-model="userForm.studentId"
+                  placeholder="请输入学号或工号"
+                />
               </el-form-item>
               <el-form-item label="院系" prop="department">
-                <el-input v-model="userForm.department" placeholder="请输入院系" />
+                <el-input
+                  v-model="userForm.department"
+                  placeholder="请输入院系"
+                />
               </el-form-item>
               <el-form-item label="专业" prop="major">
                 <el-input v-model="userForm.major" placeholder="请输入专业" />
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="updateProfile" :loading="updating">保存修改</el-button>
+                <el-button
+                  type="primary"
+                  @click="updateProfile"
+                  :loading="updating"
+                  >保存修改</el-button
+                >
                 <el-button @click="resetForm">重置</el-button>
               </el-form-item>
             </el-form>
@@ -71,14 +102,19 @@
                   <h4>邮箱验证</h4>
                   <p>绑定邮箱用于找回密码和接收通知</p>
                 </div>
-                <el-button @click="verifyEmail" :disabled="!userForm.email">验证</el-button>
+                <el-button @click="verifyEmail" :disabled="!userForm.email"
+                  >验证</el-button
+                >
               </div>
             </div>
           </el-card>
         </el-col>
       </el-row>
 
-      <el-card class="profile-card sysadmin-chart-card" style="margin-top: 24px;">
+      <el-card
+        class="profile-card sysadmin-chart-card"
+        style="margin-top: 24px"
+      >
         <template #header>
           <div class="card-header">
             <el-icon><Document /></el-icon>
@@ -89,7 +125,11 @@
           <div class="permission-group">
             <h4>角色</h4>
             <div class="permission-tags">
-              <el-tag v-for="role in userStore.user?.roles" :key="role" type="primary">
+              <el-tag
+                v-for="role in userStore.user?.roles"
+                :key="role"
+                type="primary"
+              >
                 {{ getRoleName(role) }}
               </el-tag>
             </div>
@@ -97,14 +137,23 @@
           <div class="permission-group">
             <h4>权限</h4>
             <div class="permission-tags">
-              <el-tag v-for="permission in getUserPermissions()" :key="permission" type="success">
+              <el-tag
+                v-for="permission in getUserPermissions()"
+                :key="permission"
+                type="success"
+              >
                 {{ permission }}
               </el-tag>
             </div>
           </div>
           <!-- 新增：学生班级管理入口 -->
-          <div v-if="userStore.user?.roles?.includes('STUDENT')" style="margin-top: 24px;">
-            <el-button type="primary" @click="goToClassSelect">班级管理</el-button>
+          <div
+            v-if="userStore.user?.roles?.includes('STUDENT')"
+            style="margin-top: 24px"
+          >
+            <el-button type="primary" @click="goToClassSelect"
+              >班级管理</el-button
+            >
           </div>
         </div>
       </el-card>
@@ -112,158 +161,173 @@
 
     <!-- 修改密码对话框 -->
     <el-dialog v-model="showPasswordDialog" title="修改密码" width="400px">
-      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="100px">
+      <el-form
+        :model="passwordForm"
+        :rules="passwordRules"
+        ref="passwordFormRef"
+        label-width="100px"
+      >
         <el-form-item label="当前密码" prop="oldPassword">
-          <el-input v-model="passwordForm.oldPassword" type="password" show-password />
+          <el-input
+            v-model="passwordForm.oldPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="passwordForm.newPassword" type="password" show-password />
+          <el-input
+            v-model="passwordForm.newPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input v-model="passwordForm.confirmPassword" type="password" show-password />
+          <el-input
+            v-model="passwordForm.confirmPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="showPasswordDialog = false">取消</el-button>
-        <el-button type="primary" @click="updatePassword" :loading="updatingPassword">确认修改</el-button>
+        <el-button
+          type="primary"
+          @click="updatePassword"
+          :loading="updatingPassword"
+          >确认修改</el-button
+        >
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { User, Lock, Document } from '@element-plus/icons-vue'
-import { useUserStore } from '@/store/user'
-import { updateUserProfile } from '@/api/request'
-import lottie from 'lottie-web'
-import userLottie from '@/assets/lotties/user.json'
-import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted } from "vue";
+import { ElMessage } from "element-plus";
+import { User, Lock, Document } from "@element-plus/icons-vue";
+import { useUserStore } from "@/store/user";
+import { updateUserProfile } from "@/api/request";
+import lottie from "lottie-web";
+import userLottie from "@/assets/lotties/user.json";
+import { useRouter } from "vue-router";
 
-const userStore = useUserStore()
-const router = useRouter()
+const userStore = useUserStore();
+const router = useRouter();
 
 // 响应式数据
-const userLottieRef = ref<HTMLElement>()
-const showPasswordDialog = ref(false)
-const passwordFormRef = ref()
-const userFormRef = ref()
-const updating = ref(false)
-const updatingPassword = ref(false)
+const userLottieRef = ref<HTMLElement>();
+const showPasswordDialog = ref(false);
+const passwordFormRef = ref();
+const userFormRef = ref();
+const updating = ref(false);
+const updatingPassword = ref(false);
 
 // 表单数据
 const userForm = reactive({
-  username: userStore.user?.username || '',
-  realName: (userStore.user as any)?.realName || '',
-  email: (userStore.user as any)?.email || '',
-  phone: (userStore.user as any)?.phone || '',
-  studentId: (userStore.user as any)?.studentId || '',
-  department: (userStore.user as any)?.department || '',
-  major: (userStore.user as any)?.major || ''
-})
+  username: userStore.user?.username || "",
+  realName: (userStore.user as any)?.realName || "",
+  email: (userStore.user as any)?.email || "",
+  phone: (userStore.user as any)?.phone || "",
+  studentId: (userStore.user as any)?.studentId || "",
+  department: (userStore.user as any)?.department || "",
+  major: (userStore.user as any)?.major || "",
+});
 
 const passwordForm = reactive({
-  oldPassword: '',
-  newPassword: '',
-  confirmPassword: ''
-})
+  oldPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+});
 
 // 表单验证规则
 const userRules = {
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, message: '用户名长度不能少于3位', trigger: 'blur' },
-    { max: 20, message: '用户名长度不能超过20位', trigger: 'blur' }
+    { required: true, message: "请输入用户名", trigger: "blur" },
+    { min: 3, message: "用户名长度不能少于3位", trigger: "blur" },
+    { max: 20, message: "用户名长度不能超过20位", trigger: "blur" },
   ],
-  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
+  realName: [{ required: true, message: "请输入真实姓名", trigger: "blur" }],
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    { required: true, message: "请输入邮箱", trigger: "blur" },
+    { type: "email", message: "请输入正确的邮箱格式", trigger: "blur" },
   ],
   phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur' }
+    { required: true, message: "请输入手机号", trigger: "blur" },
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: "请输入正确的手机号格式",
+      trigger: "blur",
+    },
   ],
-  studentId: [{ required: true, message: '请输入学号或工号', trigger: 'blur' }],
-  department: [{ required: true, message: '请输入院系', trigger: 'blur' }],
-  major: [{ required: true, message: '请输入专业', trigger: 'blur' }]
-}
+  studentId: [{ required: true, message: "请输入学号或工号", trigger: "blur" }],
+  department: [{ required: true, message: "请输入院系", trigger: "blur" }],
+  major: [{ required: true, message: "请输入专业", trigger: "blur" }],
+};
 
 const passwordRules = {
-  oldPassword: [{ required: true, message: '请输入当前密码', trigger: 'blur' }],
+  oldPassword: [{ required: true, message: "请输入当前密码", trigger: "blur" }],
   newPassword: [
-    { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+    { required: true, message: "请输入新密码", trigger: "blur" },
+    { min: 6, message: "密码长度不能少于6位", trigger: "blur" },
   ],
   confirmPassword: [
-    { required: true, message: '请确认新密码', trigger: 'blur' },
+    { required: true, message: "请确认新密码", trigger: "blur" },
     {
       validator: (rule: any, value: string, callback: any) => {
         if (value !== passwordForm.newPassword) {
-          callback(new Error('两次输入的密码不一致'))
+          callback(new Error("两次输入的密码不一致"));
         } else {
-          callback()
+          callback();
         }
       },
-      trigger: 'blur'
-    }
-  ]
-}
+      trigger: "blur",
+    },
+  ],
+};
 
 // 方法
 const getRoleName = (role: string) => {
   const roleNames: Record<string, string> = {
-    'SYSTEM_ADMIN': '系统管理员',
-    'DEPARTMENT_ADMIN': '院系管理员',
-    'TEACHER': '教师',
-    'STUDENT': '学生',
-    'GUEST': '访客'
-  }
-  return roleNames[role] || role
-}
+    SYSTEM_ADMIN: "系统管理员",
+    DEPARTMENT_ADMIN: "院系管理员",
+    TEACHER: "教师",
+    STUDENT: "学生",
+    GUEST: "访客",
+  };
+  return roleNames[role] || role;
+};
 
 const getUserPermissions = () => {
-  if (!userStore.user) return []
-  const userRoleUpper = userStore.user.roles[0]?.toUpperCase()
+  if (!userStore.user) return [];
+  const userRoleUpper = userStore.user.roles[0]?.toUpperCase();
   const rolePermissions = {
     SYSTEM_ADMIN: [
-      '用户管理',
-      '实验室管理',
-      '实验管理',
-      '系统配置',
-      '数据查看',
-      '报告管理'
+      "用户管理",
+      "实验室管理",
+      "实验管理",
+      "系统配置",
+      "数据查看",
+      "报告管理",
     ],
     DEPARTMENT_ADMIN: [
-      '用户查看',
-      '实验室管理',
-      '实验管理',
-      '数据查看',
-      '报告查看'
+      "用户查看",
+      "实验室管理",
+      "实验管理",
+      "数据查看",
+      "报告查看",
     ],
-    TEACHER: [
-      '实验室查看',
-      '实验创建',
-      '实验编辑',
-      '数据查看',
-      '报告创建'
-    ],
-    STUDENT: [
-      '实验室查看',
-      '实验查看',
-      '数据查看',
-      '报告查看'
-    ]
-  }
-  return rolePermissions[userRoleUpper as keyof typeof rolePermissions] || []
-}
+    TEACHER: ["实验室查看", "实验创建", "实验编辑", "数据查看", "报告创建"],
+    STUDENT: ["实验室查看", "实验查看", "数据查看", "报告查看"],
+  };
+  return rolePermissions[userRoleUpper as keyof typeof rolePermissions] || [];
+};
 
 const updateProfile = async () => {
   try {
-    await userFormRef.value.validate()
-    updating.value = true
-    
+    await userFormRef.value.validate();
+    updating.value = true;
+
     const updateData = {
       id: userStore.user?.id,
       username: userForm.username,
@@ -272,69 +336,71 @@ const updateProfile = async () => {
       phone: userForm.phone,
       studentId: userForm.studentId,
       department: userForm.department,
-      major: userForm.major
-    }
-    
-    const res = await updateUserProfile(updateData) as any
+      major: userForm.major,
+    };
+
+    const res = (await updateUserProfile(updateData)) as any;
     if (res && res.code === 200) {
-      ElMessage.success('个人信息更新成功')
+      ElMessage.success("个人信息更新成功");
       // 更新本地用户信息
-      await userStore.fetchCurrentUser()
+      await userStore.fetchCurrentUser();
     } else {
-      ElMessage.error(res?.message || '更新失败')
+      ElMessage.error(res?.message || "更新失败");
     }
   } catch (error: any) {
-    ElMessage.error(error?.message || '更新失败')
+    ElMessage.error(error?.message || "更新失败");
   } finally {
-    updating.value = false
+    updating.value = false;
   }
-}
+};
 
 const verifyEmail = () => {
-  ElMessage.info('邮箱验证功能开发中')
-}
+  ElMessage.info("邮箱验证功能开发中");
+};
 
 const updatePassword = async () => {
   try {
-    await passwordFormRef.value.validate()
-    updatingPassword.value = true
-    
+    await passwordFormRef.value.validate();
+    updatingPassword.value = true;
+
     // 这里需要调用修改密码的API
     // const res = await updatePassword(passwordForm)
-    
-    ElMessage.success('密码修改成功')
-    showPasswordDialog.value = false
-    
+
+    ElMessage.success("密码修改成功");
+    showPasswordDialog.value = false;
+
     // 重置表单
     Object.assign(passwordForm, {
-      oldPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    })
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
   } catch (error: any) {
-    ElMessage.error(error?.message || '密码修改失败')
+    ElMessage.error(error?.message || "密码修改失败");
   } finally {
-    updatingPassword.value = false
+    updatingPassword.value = false;
   }
-}
+};
 
 const resetForm = () => {
   // 重置表单到初始状态
   Object.assign(userForm, {
-    username: userStore.user?.username || '',
-    realName: (userStore.user as any)?.realName || '',
-    email: (userStore.user as any)?.email || '',
-    phone: (userStore.user as any)?.phone || '',
-    studentId: (userStore.user as any)?.studentId || '',
-    department: (userStore.user as any)?.department || '',
-    major: (userStore.user as any)?.major || ''
-  })
-  ElMessage.info('表单已重置')
-}
+    username: userStore.user?.username || "",
+    realName: (userStore.user as any)?.realName || "",
+    email: (userStore.user as any)?.email || "",
+    phone: (userStore.user as any)?.phone || "",
+    studentId: (userStore.user as any)?.studentId || "",
+    department: (userStore.user as any)?.department || "",
+    major: (userStore.user as any)?.major || "",
+  });
+  ElMessage.info("表单已重置");
+};
 
 function goToClassSelect() {
-  router.push('/student/class')
+  router.push("/student/class");
 }
+
+const goBack = () => router.back();
 
 // 生命周期
 onMounted(() => {
@@ -342,16 +408,16 @@ onMounted(() => {
   if (userLottieRef.value) {
     lottie.loadAnimation({
       container: userLottieRef.value,
-      renderer: 'svg',
+      renderer: "svg",
       loop: true,
       autoplay: true,
       animationData: userLottie,
       rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice'
-      }
-    })
+        preserveAspectRatio: "xMidYMid slice",
+      },
+    });
   }
-})
+});
 </script>
 
 <style scoped>
@@ -361,7 +427,7 @@ onMounted(() => {
 }
 
 .sysadmin-frosted-bg {
-    background: linear-gradient(120deg, #ececff 60%, #f8f8ff 100%);
+  background: linear-gradient(120deg, #ececff 60%, #f8f8ff 100%);
 }
 
 .profile-header {
@@ -373,9 +439,11 @@ onMounted(() => {
 }
 
 .header-glass.sysadmin-glass {
-  background: rgba(255,255,255,0.78);
+  background: rgba(255, 255, 255, 0.78);
   border-radius: 28px;
-  box-shadow: 0 8px 32px #a18fff22, 0 2px 8px #7c3aed11;
+  box-shadow:
+    0 8px 32px #a18fff22,
+    0 2px 8px #7c3aed11;
   backdrop-filter: blur(12px);
   border: 2px solid #ececff;
   margin: 0 auto 32px auto;
@@ -400,7 +468,7 @@ onMounted(() => {
 .profile-name {
   font-size: 38px;
   font-weight: 900;
-  background: linear-gradient(90deg, #7C3AED 0%, #a18fff 100%);
+  background: linear-gradient(90deg, #7c3aed 0%, #a18fff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -412,7 +480,7 @@ onMounted(() => {
 
 .profile-role {
   font-size: 18px;
-  color: #7C3AED;
+  color: #7c3aed;
   font-weight: 700;
   margin: 0 0 4px 0;
 }
@@ -491,11 +559,36 @@ onMounted(() => {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .security-item {
     flex-direction: column;
     gap: 12px;
     text-align: center;
   }
 }
-</style> 
+
+.back-button {
+  position: fixed;
+
+  background-color: color-mix(in srgb, #764ba2, transparent 60%);
+  color: #fff;
+  padding: 5px 13px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  display: flex;
+  align-content: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-button:hover {
+  background-color: color-mix(in srgb, #764ba2, transparent 40%);
+  transform: translateY(-1.5px);
+  /* https://smoothshadows.com/#djEsMSwxLDAuMSwyNCwxMSwwLCMwMzA3MTIsI2YzZjRmNiwjZmZmZmZmLDI%3D */
+  box-shadow: 0px 5px 10px rgba(3, 7, 18, 0.1);
+}
+</style>

@@ -1,0 +1,5 @@
+/*修改选中字的颜色*/
+::selection {
+  background-color: #a855f7;
+  color: #fff;
+}
