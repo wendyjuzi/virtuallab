@@ -483,10 +483,19 @@ const fetchStats = async () => {
     console.log('处理后的统计数据:', { userStats: userStats.value, stats: stats.value })
     console.log('用户统计数组详情:', userStats.value)
     hasRealData.value = true
-  } catch (error) {
+  } catch (error: any) {
     console.error('获取统计数据失败:', error)
-    ElMessage.error('获取统计数据失败')
+    const errorMsg = error?.response?.data?.message || error?.message || '获取统计数据失败'
+    ElMessage.error(errorMsg)
     hasRealData.value = false
+    // 设置默认值，避免页面显示错误
+    userStats.value = []
+    stats.value = {
+      totalLikes: 0,
+      totalFavorites: 0,
+      totalUsers: 0,
+      totalResources: 0
+    }
   } finally {
     statsLoading.value = false
   }
@@ -503,9 +512,13 @@ const fetchLikes = async () => {
     likeRecords.value = data?.records || []
     likeTotal.value = data?.total || 0
     console.log('处理后的点赞记录:', { records: likeRecords.value, total: likeTotal.value })
-  } catch (error) {
+  } catch (error: any) {
     console.error('获取点赞记录失败:', error)
-    ElMessage.error('获取点赞记录失败')
+    const errorMsg = error?.response?.data?.message || error?.message || '获取点赞记录失败'
+    ElMessage.error(errorMsg)
+    // 设置默认值
+    likeRecords.value = []
+    likeTotal.value = 0
   } finally {
     likeLoading.value = false
   }
@@ -520,9 +533,13 @@ const fetchFavorites = async () => {
     const data = res?.data
     favoriteRecords.value = data?.records || []
     favoriteTotal.value = data?.total || 0
-  } catch (error) {
+  } catch (error: any) {
     console.error('获取收藏记录失败:', error)
-    ElMessage.error('获取收藏记录失败')
+    const errorMsg = error?.response?.data?.message || error?.message || '获取收藏记录失败'
+    ElMessage.error(errorMsg)
+    // 设置默认值
+    favoriteRecords.value = []
+    favoriteTotal.value = 0
   } finally {
     favoriteLoading.value = false
   }
@@ -539,9 +556,12 @@ const fetchResourceStats = async () => {
     console.log('资源统计data字段:', data)
     resourceStats.value = data?.topResources || []
     console.log('处理后的资源统计:', resourceStats.value)
-  } catch (error) {
+  } catch (error: any) {
     console.error('获取资源统计失败:', error)
-    ElMessage.error('获取资源统计失败')
+    const errorMsg = error?.response?.data?.message || error?.message || '获取资源统计失败'
+    ElMessage.error(errorMsg)
+    // 设置默认值
+    resourceStats.value = []
   } finally {
     resourceStatsLoading.value = false
   }
@@ -890,11 +910,18 @@ const showDataStatus = () => {
 }
 
 // 组件挂载时加载数据
-onMounted(() => {
-  fetchStats()
-  fetchLikes()
-  fetchFavorites()
-  fetchResourceStats()
+onMounted(async () => {
+  try {
+    // 并行加载所有数据，即使某个失败也不影响其他
+    await Promise.allSettled([
+      fetchStats().catch(err => console.error('fetchStats 失败:', err)),
+      fetchLikes().catch(err => console.error('fetchLikes 失败:', err)),
+      fetchFavorites().catch(err => console.error('fetchFavorites 失败:', err)),
+      fetchResourceStats().catch(err => console.error('fetchResourceStats 失败:', err))
+    ])
+  } catch (error) {
+    console.error('初始化数据加载失败:', error)
+  }
 })
 </script>
 
@@ -907,7 +934,7 @@ onMounted(() => {
   align-items: center;
   padding: 0;
   margin-top:-22px;
-  margin-left:-22px;
+  
   margin-right:-22px;
 }
 .frosted-wrapper {

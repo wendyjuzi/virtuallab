@@ -392,10 +392,41 @@ const fetchUserList = async () => {
       size: pagination.size
     }
     const res: any = await getUserList(params)
-    if (res.code === 200) {
-      userList.value = res.data.list || []
-      pagination.total = res.data.total || 0
+    // 处理不同的响应格式
+    if (res) {
+      // 如果 res 有 code 属性，说明是 CommonResult 格式
+      if (res.code === 200 && res.data) {
+        const data = res.data
+        userList.value = data.list || data.records || []
+        pagination.total = data.total || 0
+      } 
+      // 如果 res 直接是 data 格式
+      else if (res.list || res.records) {
+        userList.value = res.list || res.records || []
+        pagination.total = res.total || 0
+      }
+      // 如果 res.data 存在但不是 CommonResult 格式
+      else if (res.data) {
+        const data = res.data
+        userList.value = data.list || data.records || []
+        pagination.total = data.total || 0
+      }
+      else {
+        ElMessage.warning('获取用户列表失败：响应格式异常')
+        userList.value = []
+        pagination.total = 0
+      }
+    } else {
+      ElMessage.warning('获取用户列表失败，请稍后重试')
+      userList.value = []
+      pagination.total = 0
     }
+  } catch (error: any) {
+    console.error('获取用户列表失败:', error)
+    const errorMsg = error?.response?.data?.message || error?.message || '获取用户列表失败'
+    ElMessage.error(errorMsg)
+    userList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }
@@ -618,8 +649,13 @@ const resetForm = () => {
 }
 
 // 生命周期
-onMounted(() => {
-  fetchUserList()
+onMounted(async () => {
+  try {
+    await fetchUserList()
+  } catch (error) {
+    // fetchUserList 内部已经有错误处理，这里只是防止未捕获的 Promise
+    console.error('初始化用户列表加载失败:', error)
+  }
 })
 </script>
 
@@ -633,7 +669,7 @@ onMounted(() => {
   align-items: center;
   margin: 0;
   margin-top:-22px;
-  margin-left:-22px;
+  
   margin-right:-22px;
 }
 

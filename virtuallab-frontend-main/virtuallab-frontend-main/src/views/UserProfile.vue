@@ -1,6 +1,7 @@
+
 <template>
-  <div class="user-profile-container">
-    <div class="profile-header">
+  <div class="user-profile-container sysadmin-frosted-bg">
+    <div class="header-glass sysadmin-glass profile-header">
       <div class="profile-lottie" ref="userLottieRef"></div>
       <div class="profile-info">
         <h1 class="profile-name">{{ userStore.user?.username || '用户' }}</h1>
@@ -12,7 +13,7 @@
     <div class="profile-content">
       <el-row :gutter="24">
         <el-col :span="12">
-          <el-card class="profile-card">
+          <el-card class="profile-card sysadmin-chart-card">
             <template #header>
               <div class="card-header">
                 <el-icon><User /></el-icon>
@@ -50,7 +51,7 @@
         </el-col>
 
         <el-col :span="12">
-          <el-card class="profile-card">
+          <el-card class="profile-card sysadmin-chart-card">
             <template #header>
               <div class="card-header">
                 <el-icon><Lock /></el-icon>
@@ -77,7 +78,7 @@
         </el-col>
       </el-row>
 
-      <el-card class="profile-card" style="margin-top: 24px;">
+      <el-card class="profile-card sysadmin-chart-card" style="margin-top: 24px;">
         <template #header>
           <div class="card-header">
             <el-icon><Document /></el-icon>
@@ -356,20 +357,31 @@ onMounted(() => {
 <style scoped>
 .user-profile-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
 }
 
+.sysadmin-frosted-bg {
+    background: linear-gradient(120deg, #ececff 60%, #f8f8ff 100%);
+}
+
 .profile-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
   padding: 32px;
   margin-bottom: 24px;
   display: flex;
   align-items: center;
   gap: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.header-glass.sysadmin-glass {
+  background: rgba(255,255,255,0.78);
+  border-radius: 28px;
+  box-shadow: 0 8px 32px #a18fff22, 0 2px 8px #7c3aed11;
+  backdrop-filter: blur(12px);
+  border: 2px solid #ececff;
+  margin: 0 auto 32px auto;
+  padding: 38px;
+  text-align: center;
+  max-width: 1200px;
 }
 
 .profile-lottie {
@@ -382,24 +394,32 @@ onMounted(() => {
 
 .profile-info {
   flex: 1;
+  text-align: left;
 }
 
 .profile-name {
-  font-size: 28px;
-  font-weight: 600;
-  color: #2c3e50;
+  font-size: 38px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #7C3AED 0%, #a18fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
   margin: 0 0 8px 0;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 12px #a18fff33;
 }
 
 .profile-role {
-  font-size: 16px;
-  color: #7f8c8d;
+  font-size: 18px;
+  color: #7C3AED;
+  font-weight: 700;
   margin: 0 0 4px 0;
 }
 
 .profile-email {
-  font-size: 14px;
-  color: #95a5a6;
+  font-size: 16px;
+  color: #a18fff;
   margin: 0;
 }
 
@@ -408,11 +428,11 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.profile-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+.sysadmin-chart-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 4px 16px #bdbdfc22;
+  padding: 18px 12px 12px 12px;
 }
 
 .card-header {
@@ -478,4 +498,4 @@ onMounted(() => {
     text-align: center;
   }
 }
-</style> 
+</style>

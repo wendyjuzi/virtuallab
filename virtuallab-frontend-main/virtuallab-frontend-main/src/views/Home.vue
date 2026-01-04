@@ -17,7 +17,12 @@
             @click="viewExperiment(experiment)"
             :style="get3DStyle(idx)"
           >
-            <img :src="experiment.imageUrl || experiment.image || '/images/experiments/experiment1.png'" :alt="experiment.title || experiment.name" class="carousel-img-3d" />
+            <img 
+              :src="getImageUrl(experiment)" 
+              :alt="experiment.title || experiment.name" 
+              class="carousel-img-3d"
+              @error="handleImageError"
+            />
             <div class="carousel-caption-3d">
               <h3>{{ experiment.title || experiment.name }}</h3>
             </div>
@@ -55,7 +60,11 @@
             <el-col :span="6" v-for="experiment in filteredExperiments" :key="experiment.id">
               <el-card class="experiment-card" @click="viewExperiment(experiment)">
                 <div class="experiment-image">
-                  <img :src="experiment.imageUrl || experiment.image || '/images/experiments/experiment1.png'" :alt="experiment.title || experiment.name">
+                  <img 
+                    :src="getImageUrl(experiment)" 
+                    :alt="experiment.title || experiment.name"
+                    @error="handleImageError"
+                  >
                   <div class="experiment-overlay">
                     <el-icon class="view-icon"><View /></el-icon>
                   </div>
@@ -127,6 +136,7 @@ import LikeFavoriteButton from '@/components/LikeFavoriteButton.vue'
 import { getExperimentList } from '@/api/experiment'
 import { useUserStore } from '@/store/user'
 import AppNavbar from '@/components/AppNavbar.vue'
+import { getExperimentImageUrl, handleImageError as handleImageErrorUtil } from '@/utils/imageUtils'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -214,6 +224,16 @@ const handleSortChange = () => {
 
 const viewExperiment = (experiment: any) => {
   router.push(`/experiment/${experiment.id}`)
+}
+
+// 获取图片URL
+const getImageUrl = (experiment: any) => {
+  return getExperimentImageUrl(experiment.imageUrl || experiment.image)
+}
+
+// 图片加载错误处理
+const handleImageError = (event: Event) => {
+  handleImageErrorUtil(event)
 }
 
 // 轮播图相关逻辑

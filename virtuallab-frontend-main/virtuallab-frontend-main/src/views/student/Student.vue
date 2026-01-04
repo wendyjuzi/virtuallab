@@ -299,7 +299,7 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   margin-top:-26px;
-  margin-left:-24px;
+  
   margin-right:-24px;
   margin-bottom:-26px;
 }

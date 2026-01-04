@@ -37,7 +37,7 @@
         </div>
         <div class="left-bottom">
           <div class="management-section">
-            <h2>DEPARTMENT<br>MANAGEMENT</h2>
+            <h2>院系<br>管理</h2>
             <div class="management-grid">
               <div class="management-card" @click="navigateTo('/department/users')">
                 <div class="card-icon">👥</div>
@@ -62,7 +62,7 @@
       <div class="right-panel">
         <div class="right-top">
           <div class="recent-activities">
-            <h2><span>LATEST</span><span>NEWS</span></h2>
+            <h2><span>最新</span><span>通知</span></h2>
             <div class="activity-list">
               <div
                   class="activity-item"
@@ -316,7 +316,7 @@ const handleCreateUser = async () => {
 
     // 调用API创建用户
     const res = await createUser(payload)
-    if (res.code === 200) {
+    if (res.data.code === 200) {
       ElMessage.success('用户创建成功')
       showUserDialog.value = false
       // 刷新统计数据
@@ -523,7 +523,7 @@ onMounted(async () => {  // 添加 async 关键字
   padding: 0 0 32px 0;
   margin-top:-26px;
   margin-bottom:-26px;
-  margin-left:-23px;
+  
   margin-right:-23px;
 
 }

@@ -19,7 +19,7 @@
 
     <div class="content-section card-hover">
       <div class="left">
-        <img :src="getValidImageUrl(project)" alt="实验封面" @error="e => e.target.src='/images/experiments/experiment1.png'">
+        <img :src="getValidImageUrl(project)" alt="实验封面" @error="handleImageError">
       </div>
       <div class="right">
         <p class="description">{{ project?.description }}</p>
@@ -114,6 +114,7 @@ import { useUserStore } from '@/store/user';
 import { useLikeFavoriteStore } from '@/store/likeFavorite';
 import { Star, StarFilled } from '@element-plus/icons-vue';
 import ResourceShare from '@/components/ResourceShare.vue';
+import { getExperimentImageUrl, handleImageError as handleImageErrorUtil } from '@/utils/imageUtils';
 
 interface Project {
   id: number;
@@ -215,27 +216,14 @@ async function handleDelete(id: number) {
     ElMessage.error('删除失败');
   }
 }
-// 新增健壮的图片获取方法
+// 图片获取方法（使用统一工具函数）
 function getValidImageUrl(project: any): string {
-  if (project?.imageUrl) {
-    if (project.imageUrl.startsWith('http')) {
-      return project.imageUrl;
-    }
-    if (project.imageUrl.startsWith('/')) {
-      return project.imageUrl;
-    }
-    return `http://localhost:8080${project.imageUrl}`;
-  }
-  if (project?.image) {
-    if (project.image.startsWith('http')) {
-      return project.image;
-    }
-    if (project.image.startsWith('/')) {
-      return project.image;
-    }
-    return `http://localhost:8080${project.image}`;
-  }
-  return '/images/experiments/experiment1.png';
+  return getExperimentImageUrl(project?.imageUrl || project?.image)
+}
+
+// 图片加载错误处理
+const handleImageError = (event: Event) => {
+  handleImageErrorUtil(event)
 }
 
 const handleLike = async () => {
