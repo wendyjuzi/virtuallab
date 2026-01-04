@@ -22,16 +22,16 @@
 
     <div class="grid">
       <div
-        v-for="item in projects"
-        :key="item.id"
-        class="card"
-        @click="goToDetail(item.id)"
-        role="button"
-        tabindex="0"
-        @keydown.enter="goToDetail(item.id)"
+          v-for="item in projects"
+          :key="item.id"
+          class="card"
+          @click="goToDetail(item.id)"
+          role="button"
+          tabindex="0"
+          @keydown.enter="goToDetail(item.id)"
       >
         <div class="image-wrapper">
-          <img :src="getFullUrl(item.imageUrl)" alt="cover" @error="handleImageError" />
+          <img :src="getFullUrl(item.imageUrl)" alt="cover" />
         </div>
         <p class="project-name">{{ item.name }}</p>
       </div>
@@ -74,15 +74,10 @@ const search = async () => {
   });
   projects.value = res.data;
 };
-import { getExperimentImageUrl, handleImageError as handleImageErrorUtil } from '@/utils/imageUtils'
-
 const getFullUrl = (url: string | null | undefined): string => {
-  return getExperimentImageUrl(url)
-}
-
-const handleImageError = (event: Event) => {
-  handleImageErrorUtil(event)
-}
+  if (!url) return ''; // 防止 null 报错
+  return url.startsWith('http') ? url : `http://localhost:8080${url}`;
+};
 
 
 const goToDetail = (id: number) => {

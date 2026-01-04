@@ -410,7 +410,7 @@ const fetchUserList = async () => {
         const data = res.data
         userList.value = data.list || data.records || []
         pagination.total = data.total || 0
-      }
+    }
       else {
         ElMessage.warning('获取用户列表失败：响应格式异常')
         userList.value = []

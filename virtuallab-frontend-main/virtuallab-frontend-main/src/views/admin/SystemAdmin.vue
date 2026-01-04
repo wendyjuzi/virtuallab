@@ -29,6 +29,11 @@
             <div class="stat-label">今日所有登录行为</div>
           </div>
         </div>
+        <div class="dashboard-card sysadmin-chart-card">
+          <div class="chart-decoration"></div>
+          <h3>实验活跃度趋势</h3>
+          <div ref="experimentActiveChart" class="dashboard-chart"></div>
+        </div>
       </div>
       <!-- 中列 -->
       <div class="admin-col admin-col-center">
@@ -36,6 +41,38 @@
           <div class="chart-decoration"></div>
           <h3>实验类型分布</h3>
           <div ref="experimentTypeChart" class="dashboard-chart"></div>
+        </div>
+        <div class="center-bottom-row">
+          <div class="quick-actions-row quick-actions sysadmin-frosted-card">
+            <div class="action-title-bar">
+              <span class="action-title">快捷操作</span>
+              <span class="action-bar-decoration"></span>
+            </div>
+            <el-button
+              v-for="item in quickActions"
+              :key="item.path"
+              class="action-btn sysadmin-glow-btn"
+              @click="handleQuickAction(item.path)"
+              style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; width: 100%;"
+            >
+              <el-icon :size="20"><component :is="item.icon" /></el-icon>
+              {{ item.label }}
+            </el-button>
+          </div>
+          <div class="recent-activities-row recent-activities sysadmin-frosted-card sysadmin-activity-skew">
+            <div class="notebook-side"></div>
+            <div class="activity-top-decoration"></div>
+            <h2>最近活动</h2>
+            <div class="activity-list">
+              <div class="activity-item" v-for="activity in recentActivities" :key="activity.id">
+                <div class="activity-icon">{{ activity.icon }}</div>
+                <div class="activity-content">
+                  <div class="activity-title">{{ activity.title }}</div>
+                  <div class="activity-time">{{ activity.time }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <!-- 右列 -->
@@ -63,6 +100,7 @@ import { useUserStore } from '@/store/user'
 import * as echarts from 'echarts'
 import { getStatistics } from '@/api/request'
 import axios from 'axios'
+import { UserFilled, OfficeBuilding, Document, DataAnalysis, Monitor, Setting, Plus, Bell } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -76,15 +114,37 @@ const statistics = reactive({
   todayLoginCount: 0 // 今日所有登录行为总次数
 })
 
+// recentActivities 声明，消除 linter 报错
+const recentActivities = ref([
+  { id: 1, icon: '📝', title: '管理员登录', time: '2024-06-01 10:00' },
+  { id: 2, icon: '🧪', title: '新实验发布', time: '2024-06-01 09:30' },
+  { id: 4, icon: '🏢', title: '新增院系：人工智能学院', time: '2024-06-01 08:55' },
+  { id: 8, icon: '🚨', title: '系统监控告警：CPU使用率过高', time: '2024-06-01 07:45' }
+])
+
+// 快捷操作
+const quickActions = [
+  { icon: UserFilled, label: '用户管理', path: '/admin/users' },
+  { icon: OfficeBuilding, label: '院系管理', path: '/admin/departments' },
+  { icon: Document, label: '系统日志', path: '/admin/logs' },
+  { icon: DataAnalysis, label: '数据备份', path: '/admin/backup' },
+  { icon: Monitor, label: '系统监控', path: '/admin/monitor' },
+  { icon: Setting, label: '系统设置', path: '/admin/settings' }
+]
+const handleQuickAction = (path: string) => {
+  router.push(path)
+}
 
 // 图表ref
 const experimentTypeChart = ref<HTMLElement | null>(null)
+const experimentActiveChart = ref<HTMLElement | null>(null)
 const experimentFinishChart = ref<HTMLElement | null>(null)
 const experimentTopChart = ref<HTMLElement | null>(null)
 const logSankeyChart = ref<HTMLElement | null>(null)
 const userRoleChart = ref<HTMLElement | null>(null)
 
 let experimentTypeChartInstance: echarts.ECharts | null = null
+let experimentActiveChartInstance: echarts.ECharts | null = null
 let experimentFinishChartInstance: echarts.ECharts | null = null
 let experimentTopChartInstance: echarts.ECharts | null = null
 let logSankeyChartInstance: echarts.ECharts | null = null
@@ -92,7 +152,9 @@ let userRoleChartInstance: echarts.ECharts | null = null
 
 // 实验统计数据
 interface NameValue { name: string; value: number }
+interface ActiveData { timePoints: string[]; activeCounts: number[] }
 const typeData = ref<NameValue[]>([])
+const activeData = ref<ActiveData>({ timePoints: [], activeCounts: [] })
 const finishData = ref<NameValue[]>([])
 const topData = ref<NameValue[]>([])
 
@@ -110,6 +172,18 @@ const fetchExperimentStatistics = async () => {
       typeData.value = typeRes.data.data
     } else {
       typeData.value = []
+    }
+    // 实验活跃度趋势
+    const activeRes = await axios.get('/system-admin/statistics/experiment-active')
+    let arr = []
+    if (Array.isArray(activeRes.data)) {
+      arr = activeRes.data
+    } else if (activeRes.data && Array.isArray(activeRes.data.data)) {
+      arr = activeRes.data.data
+    }
+    activeData.value = {
+      timePoints: arr.map((item: any) => item.name),
+      activeCounts: arr.map((item: any) => item.value)
     }
     // 实验完成率排行
     const finishRes = await axios.get('/system-admin/statistics/experiment-finish-rate')
@@ -227,6 +301,39 @@ const renderExperimentTypeChart = () => {
     ]
   })
   experimentTypeChartInstance.resize()
+}
+
+const renderExperimentActiveChart = () => {
+  if (!experimentActiveChart.value) return
+  experimentActiveChartInstance = echarts.init(experimentActiveChart.value)
+  experimentActiveChartInstance.setOption({
+    tooltip: { trigger: 'axis', textStyle: { fontSize: 12, color: '#666' } },
+    legend: { show: false },
+    xAxis: {
+      type: 'category',
+      data: activeData.value.timePoints,
+      boundaryGap: false,
+      axisLabel: { fontSize: 12, color: '#888' }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { fontSize: 12, color: '#888' }
+    },
+    series: [
+      {
+        name: '活跃次数',
+        type: 'line',
+        data: activeData.value.activeCounts,
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
+        lineStyle: { width: 3, color: '#6b4fff' },
+        areaStyle: { color: 'rgba(107,79,255,0.08)' },
+        label: { show: false }
+      }
+    ],
+    color: ['#6b4fff']
+  })
 }
 
 const renderExperimentFinishChart = () => {
@@ -457,6 +564,7 @@ const renderUserRoleChart = () => {
 const initSimulationCharts = async () => {
   await nextTick()
   renderExperimentTypeChart()
+  renderExperimentActiveChart()
   renderExperimentFinishChart()
   renderExperimentTopChart()
   await fetchUserRoleData()
@@ -502,6 +610,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
   experimentTypeChartInstance?.dispose()
+  experimentActiveChartInstance?.dispose()
   experimentFinishChartInstance?.dispose()
   experimentTopChartInstance?.dispose()
   logSankeyChartInstance?.dispose()
@@ -758,7 +867,7 @@ body {
   height: 18px;
   background: linear-gradient(135deg, #7C3AED 0%, #a18fff 100%);
   border-radius: 2px;
-  }
+}
 .dashboard-chart, .log-sankey-chart-full, .user-role-chart-large {
   background: transparent;
   border-radius: 16px;
