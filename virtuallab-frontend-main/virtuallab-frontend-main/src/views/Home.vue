@@ -16,25 +16,14 @@
       <div class="experiment-carousel fancy-carousel">
         <div class="carousel-track-3d">
           <div
-            v-for="(experiment, idx) in carouselExperiments"
-            :key="experiment.id"
-            class="carousel-item-3d"
-            :class="{
-              active: idx === carouselIndex,
-              left: idx === leftIndex,
-              right: idx === rightIndex,
-              farleft: idx === farLeftIndex,
-              farright: idx === farRightIndex,
-            }"
-            @click="viewExperiment(experiment)"
-            :style="get3DStyle(idx)"
+              v-for="(experiment, idx) in carouselExperiments"
+              :key="experiment.id"
+              class="carousel-item-3d"
+              :class="{ active: idx === carouselIndex, left: idx === leftIndex, right: idx === rightIndex, farleft: idx === farLeftIndex, farright: idx === farRightIndex }"
+              @click="viewExperiment(experiment)"
+              :style="get3DStyle(idx)"
           >
-            <img
-              :src="getImageUrl(experiment)"
-              :alt="experiment.title || experiment.name"
-              class="carousel-img-3d"
-              @error="handleImageError"
-            />
+            <img :src="experiment.imageUrl || experiment.image || '/images/experiments/experiment1.png'" :alt="experiment.title || experiment.name" class="carousel-img-3d" />
             <div class="carousel-caption-3d">
               <h3>{{ experiment.title || experiment.name }}</h3>
             </div>
@@ -56,10 +45,10 @@
         </button>
         <div class="carousel-indicators">
           <span
-            v-for="(item, idx) in carouselExperiments"
-            :key="item.id"
-            :class="['indicator', { active: idx === carouselIndex }]"
-            @click="goToCarousel(idx)"
+              v-for="(item, idx) in carouselExperiments"
+              :key="item.id"
+              :class="['indicator', { active: idx === carouselIndex }]"
+              @click="goToCarousel(idx)"
           ></span>
         </div>
       </div>
@@ -95,11 +84,7 @@
                 @click="viewExperiment(experiment)"
               >
                 <div class="experiment-image">
-                  <img
-                    :src="getImageUrl(experiment)"
-                    :alt="experiment.title || experiment.name"
-                    @error="handleImageError"
-                  />
+                  <img :src="experiment.imageUrl || experiment.image || '/images/experiments/experiment1.png'" :alt="experiment.title || experiment.name">
                   <div class="experiment-overlay">
                     <el-icon class="view-icon"><View /></el-icon>
                   </div>
@@ -112,9 +97,9 @@
                   <!-- 点赞收藏按钮 -->
                   <div class="experiment-actions" @click.stop>
                     <LikeFavoriteButton
-                      :experiment-id="experiment.id"
-                      :initial-like-count="experiment.likes || 0"
-                      :initial-favorite-count="experiment.favorites || 0"
+                        :experiment-id="experiment.id"
+                        :initial-like-count="experiment.likes || 0"
+                        :initial-favorite-count="experiment.favorites || 0"
                     />
                   </div>
                 </div>
@@ -172,24 +157,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import {
-  View,
-  Star,
-  Collection,
-  Monitor,
-  User,
-  DataAnalysis,
-  ArrowLeft,
-  Warning,
-} from "@element-plus/icons-vue";
-import { useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
-import LikeFavoriteButton from "@/components/LikeFavoriteButton.vue";
-import { getExperimentList } from "@/api/experiment";
-import { useUserStore } from "@/store/user";
-import AppNavbar from "@/components/AppNavbar.vue";
-// import { getExperimentImageUrl, handleImageError as handleImageErrorUtil } from '@/utils/imageUtils'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { View, Star, Collection, Monitor, User, DataAnalysis, ArrowLeft, Warning } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import LikeFavoriteButton from '@/components/LikeFavoriteButton.vue'
+import { getExperimentList } from '@/api/experiment'
+import { useUserStore } from '@/store/user'
+import AppNavbar from '@/components/AppNavbar.vue'
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -281,16 +256,6 @@ const handleSortChange = () => {
 
 const viewExperiment = (experiment: any) => {
   router.push(`/experiment/${experiment.id}`);
-};
-
-// 获取图片URL
-const getImageUrl = (experiment: any) => {
-  return getExperimentImageUrl(experiment.imageUrl || experiment.image);
-};
-
-// 图片加载错误处理
-const handleImageError = (event: Event) => {
-  handleImageErrorUtil(event);
 };
 
 // 轮播图相关逻辑

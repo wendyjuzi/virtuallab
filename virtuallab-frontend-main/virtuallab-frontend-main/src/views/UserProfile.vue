@@ -498,4 +498,4 @@ onMounted(() => {
     text-align: center;
   }
 }
-</style>
+</style> 

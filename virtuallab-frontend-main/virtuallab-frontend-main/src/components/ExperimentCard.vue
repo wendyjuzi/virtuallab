@@ -2,11 +2,7 @@
   <div class="experiment-card" @click="handleView">
     <div class="card-badge">{{ categoryName }}</div>
     <div class="experiment-image">
-      <img 
-        :src="getImageUrl(experiment)" 
-        :alt="experiment.title || experiment.name"
-        @error="handleImageError"
-      >
+      <img :src="experiment.imageUrl || experiment.image || '/images/experiments/experiment1.png'" :alt="experiment.title || experiment.name">
       <div class="experiment-overlay">
         <button class="view-btn" @click.stop="handleView">
           <el-icon><View /></el-icon> 查看详情
@@ -22,10 +18,10 @@
         <div class="stat"><el-icon><Collection /></el-icon> {{ experiment.favorites || 0 }}</div>
       </div>
       <div class="experiment-actions" @click.stop>
-        <LikeFavoriteButton 
-          :experiment-id="experiment.id"
-          :initial-like-count="experiment.likes || 0"
-          :initial-favorite-count="experiment.favorites || 0"
+        <LikeFavoriteButton
+            :experiment-id="experiment.id"
+            :initial-like-count="experiment.likes || 0"
+            :initial-favorite-count="experiment.favorites || 0"
         />
       </div>
     </div>
@@ -37,7 +33,6 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { View, Star, Collection } from '@element-plus/icons-vue'
 import LikeFavoriteButton from './LikeFavoriteButton.vue'
-import { getExperimentImageUrl, handleImageError as handleImageErrorUtil } from '@/utils/imageUtils'
 
 const props = defineProps<{
   experiment: any
@@ -56,16 +51,6 @@ const categoryName = computed(() => {
   }
   return map[props.experiment.category] || '其他'
 })
-
-// 获取图片URL
-const getImageUrl = (experiment: any) => {
-  return getExperimentImageUrl(experiment.imageUrl || experiment.image)
-}
-
-// 图片加载错误处理
-const handleImageError = (event: Event) => {
-  handleImageErrorUtil(event)
-}
 </script>
 
 <style scoped>
