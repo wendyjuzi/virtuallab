@@ -35,13 +35,14 @@ import Breadcrumb from '@/components/Breadcrumb.vue'
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  padding: 24px 24px 24px 0;
 
 }
 
 
 .main-content {
   flex: 1;
-  padding: 24px;
   background: #f8fafc;
 }
 </style> 

@@ -146,10 +146,22 @@ const getSectionTitle = (menuKey: string) => {
   font-weight: 500;
 }
 
+.nav-link span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .nav-link .el-icon {
   font-size: 16px;
   width: 20px;
   text-align: center;
+}
+
+.nav-link-child span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-link-child .el-icon {

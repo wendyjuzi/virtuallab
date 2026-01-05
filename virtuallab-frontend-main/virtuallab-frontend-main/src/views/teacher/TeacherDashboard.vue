@@ -206,7 +206,7 @@
           <div class="section-header stats-header">
             <h2 class="section-title stats-title">
               <i class="section-icon stats-icon"></i>
-              <span class="stats-title-text">Instructional Analytics</span>
+              <span class="stats-title-text">教学分析</span>
               <!-- <span class="stats-title-bg">TEACHING</span> -->
             </h2>
           </div>

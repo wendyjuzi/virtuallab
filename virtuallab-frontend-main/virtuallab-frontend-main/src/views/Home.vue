@@ -1,8 +1,14 @@
 <template>
   <div class="home">
-
     <!-- 直接显示首页内容，无论是否登录 -->
-    <el-button class="back-btn" @click="router.back()" circle plain type="primary" title="返回上一页">
+    <el-button
+      class="back-btn"
+      @click="router.back()"
+      circle
+      plain
+      type="primary"
+      title="返回上一页"
+    >
       <el-icon><ArrowLeft /></el-icon>
     </el-button>
     <!-- 实验项目轮播图 -->
@@ -10,12 +16,12 @@
       <div class="experiment-carousel fancy-carousel">
         <div class="carousel-track-3d">
           <div
-            v-for="(experiment, idx) in carouselExperiments"
-            :key="experiment.id"
-            class="carousel-item-3d"
-            :class="{ active: idx === carouselIndex, left: idx === leftIndex, right: idx === rightIndex, farleft: idx === farLeftIndex, farright: idx === farRightIndex }"
-            @click="viewExperiment(experiment)"
-            :style="get3DStyle(idx)"
+              v-for="(experiment, idx) in carouselExperiments"
+              :key="experiment.id"
+              class="carousel-item-3d"
+              :class="{ active: idx === carouselIndex, left: idx === leftIndex, right: idx === rightIndex, farleft: idx === farLeftIndex, farright: idx === farRightIndex }"
+              @click="viewExperiment(experiment)"
+              :style="get3DStyle(idx)"
           >
             <img :src="experiment.imageUrl || experiment.image || '/images/experiments/experiment1.png'" :alt="experiment.title || experiment.name" class="carousel-img-3d" />
             <div class="carousel-caption-3d">
@@ -23,14 +29,26 @@
             </div>
           </div>
         </div>
-        <button class="carousel-control prev fancy-btn" @click="prevCarousel" aria-label="上一张"><i class="el-icon-arrow-left"></i></button>
-        <button class="carousel-control next fancy-btn" @click="nextCarousel" aria-label="下一张"><i class="el-icon-arrow-right"></i></button>
+        <button
+          class="carousel-control prev fancy-btn"
+          @click="prevCarousel"
+          aria-label="上一张"
+        >
+          <i class="el-icon-arrow-left"></i>
+        </button>
+        <button
+          class="carousel-control next fancy-btn"
+          @click="nextCarousel"
+          aria-label="下一张"
+        >
+          <i class="el-icon-arrow-right"></i>
+        </button>
         <div class="carousel-indicators">
           <span
-            v-for="(item, idx) in carouselExperiments"
-            :key="item.id"
-            :class="['indicator', { active: idx === carouselIndex }]"
-            @click="goToCarousel(idx)"
+              v-for="(item, idx) in carouselExperiments"
+              :key="item.id"
+              :class="['indicator', { active: idx === carouselIndex }]"
+              @click="goToCarousel(idx)"
           ></span>
         </div>
       </div>
@@ -41,7 +59,11 @@
         <!-- 分类筛选 -->
         <!-- 排序选项 -->
         <div class="sort-options">
-          <el-radio-group v-model="sort" @change="handleSortChange" class="sort-group">
+          <el-radio-group
+            v-model="sort"
+            @change="handleSortChange"
+            class="sort-group"
+          >
             <el-radio-button value="hot">热门</el-radio-button>
             <el-radio-button value="newest">最新</el-radio-button>
             <el-radio-button value="views">浏览</el-radio-button>
@@ -52,8 +74,15 @@
         <!-- 实验项目展示 -->
         <div class="experiments-grid">
           <el-row :gutter="24" v-loading="loading">
-            <el-col :span="6" v-for="experiment in filteredExperiments" :key="experiment.id">
-              <el-card class="experiment-card" @click="viewExperiment(experiment)">
+            <el-col
+              :span="6"
+              v-for="experiment in filteredExperiments"
+              :key="experiment.id"
+            >
+              <el-card
+                class="experiment-card"
+                @click="viewExperiment(experiment)"
+              >
                 <div class="experiment-image">
                   <img :src="experiment.imageUrl || experiment.image || '/images/experiments/experiment1.png'" :alt="experiment.title || experiment.name">
                   <div class="experiment-overlay">
@@ -61,15 +90,16 @@
                   </div>
                 </div>
                 <div class="experiment-info">
-                  <h3 class="experiment-title">{{ experiment.title || experiment.name }}</h3>
-                  <div class="experiment-stats">
-                  </div>
+                  <h3 class="experiment-title">
+                    {{ experiment.title || experiment.name }}
+                  </h3>
+                  <div class="experiment-stats"></div>
                   <!-- 点赞收藏按钮 -->
                   <div class="experiment-actions" @click.stop>
                     <LikeFavoriteButton
-                      :experiment-id="experiment.id"
-                      :initial-like-count="experiment.likes || 0"
-                      :initial-favorite-count="experiment.favorites || 0"
+                        :experiment-id="experiment.id"
+                        :initial-like-count="experiment.likes || 0"
+                        :initial-favorite-count="experiment.favorites || 0"
                     />
                   </div>
                 </div>
@@ -77,7 +107,10 @@
             </el-col>
           </el-row>
           <!-- 空状态 -->
-          <div v-if="!loading && filteredExperiments.length === 0" class="empty-state">
+          <div
+            v-if="!loading && filteredExperiments.length === 0"
+            class="empty-state"
+          >
             <el-empty description="暂无实验数据" />
           </div>
         </div>
@@ -109,7 +142,12 @@
       <div class="footer-content">
         <span>© 2024 虚拟实验室管理系统 VirtualLab</span>
         <div class="footer-links">
-          <a href="https://www.flaticon.com/free-stickers/study" title="study stickers" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://www.flaticon.com/free-stickers/study"
+            title="study stickers"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Study stickers created by Stickers - Flaticon
           </a>
         </div>
@@ -128,184 +166,203 @@ import { getExperimentList } from '@/api/experiment'
 import { useUserStore } from '@/store/user'
 import AppNavbar from '@/components/AppNavbar.vue'
 
-const router = useRouter()
-const userStore = useUserStore()
-const isLogin = computed(() => !!userStore.token)
+const router = useRouter();
+const userStore = useUserStore();
+const isLogin = computed(() => !!userStore.token);
 
 function goLogin() {
-  router.push('/login')
+  router.push("/login");
 }
 
 // 响应式数据
-const activeCategory = ref('all')
-const sort = ref('hot')
-const loading = ref(false)
+const activeCategory = ref("all");
+const sort = ref("hot");
+const loading = ref(false);
 
 // 实验数据
-const experiments = ref<any[]>([])
+const experiments = ref<any[]>([]);
 
 // 获取实验列表
 const fetchExperiments = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     const params: any = {
       page: 1,
-      size: 20
-    }
+      size: 20,
+    };
 
     // 添加分类筛选
-    if (activeCategory.value !== 'all') {
-      params.category = activeCategory.value
+    if (activeCategory.value !== "all") {
+      params.category = activeCategory.value;
     }
 
     // 添加排序
     if (sort.value) {
-      params.sort = sort.value
+      params.sort = sort.value;
     }
 
-    const res: any = await getExperimentList(params)
+    const res: any = await getExperimentList(params);
     if (res.code === 200) {
-      experiments.value = res.data.records || res.data.list || res.data || []
+      experiments.value = res.data.records || res.data.list || res.data || [];
     } else {
-      ElMessage.error(res?.message || '获取实验列表失败')
+      ElMessage.error(res?.message || "获取实验列表失败");
     }
   } catch (error: any) {
-    console.error('获取实验列表失败:', error)
-    ElMessage.error('获取实验列表失败')
+    console.error("获取实验列表失败:", error);
+    ElMessage.error("获取实验列表失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // 根据分类筛选实验
 const filteredExperiments = computed(() => {
-  let filtered = experiments.value
+  let filtered = experiments.value;
 
   // 前端二次筛选（如果后端不支持）
-  if (activeCategory.value !== 'all') {
-    filtered = filtered.filter(exp => exp.category === activeCategory.value)
+  if (activeCategory.value !== "all") {
+    filtered = filtered.filter((exp) => exp.category === activeCategory.value);
   }
 
   // 前端排序（如果后端不支持）
   switch (sort.value) {
-    case 'hot':
-      return filtered.sort((a, b) => (b.views || 0) - (a.views || 0))
-    case 'newest':
-      return filtered.sort((a, b) => new Date(b.createTime || 0).getTime() - new Date(a.createTime || 0).getTime())
-    case 'views':
-      return filtered.sort((a, b) => (b.views || 0) - (a.views || 0))
-    case 'likes':
-      return filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0))
-    case 'favorites':
-      return filtered.sort((a, b) => (b.favorites || 0) - (a.favorites || 0))
+    case "hot":
+      return filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+    case "newest":
+      return filtered.sort(
+        (a, b) =>
+          new Date(b.createTime || 0).getTime() -
+          new Date(a.createTime || 0).getTime()
+      );
+    case "views":
+      return filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+    case "likes":
+      return filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    case "favorites":
+      return filtered.sort((a, b) => (b.favorites || 0) - (a.favorites || 0));
     default:
-      return filtered
+      return filtered;
   }
-})
+});
 
 // 事件处理
 const handleCategoryChange = () => {
-  fetchExperiments()
-}
+  fetchExperiments();
+};
 
 const handleSortChange = () => {
-  fetchExperiments()
-}
+  fetchExperiments();
+};
 
 const viewExperiment = (experiment: any) => {
-  router.push(`/experiment/${experiment.id}`)
-}
+  router.push(`/experiment/${experiment.id}`);
+};
 
 // 轮播图相关逻辑
-const carouselIndex = ref(0)
-const carouselExperiments = computed(() => experiments.value.slice(0, 5))
-let carouselTimer: any = null
+const carouselIndex = ref(0);
+const carouselExperiments = computed(() => experiments.value.slice(0, 5));
+let carouselTimer: any = null;
 
 const nextCarousel = () => {
-  carouselIndex.value = (carouselIndex.value + 1) % carouselExperiments.value.length
-}
+  carouselIndex.value =
+    (carouselIndex.value + 1) % carouselExperiments.value.length;
+};
 const prevCarousel = () => {
-  carouselIndex.value = (carouselIndex.value - 1 + carouselExperiments.value.length) % carouselExperiments.value.length
-}
+  carouselIndex.value =
+    (carouselIndex.value - 1 + carouselExperiments.value.length) %
+    carouselExperiments.value.length;
+};
 const goToCarousel = (idx: number) => {
-  carouselIndex.value = idx
-}
+  carouselIndex.value = idx;
+};
 const startCarouselAuto = () => {
-  stopCarouselAuto()
+  stopCarouselAuto();
   carouselTimer = setInterval(() => {
-    nextCarousel()
-  }, 3500)
-}
+    nextCarousel();
+  }, 3500);
+};
 const stopCarouselAuto = () => {
-  if (carouselTimer) clearInterval(carouselTimer)
-  carouselTimer = null
-}
+  if (carouselTimer) clearInterval(carouselTimer);
+  carouselTimer = null;
+};
 
 // 3D轮播索引计算
-const leftIndex = computed(() => (carouselIndex.value - 1 + carouselExperiments.value.length) % carouselExperiments.value.length)
-const rightIndex = computed(() => (carouselIndex.value + 1) % carouselExperiments.value.length)
-const farLeftIndex = computed(() => (carouselIndex.value - 2 + carouselExperiments.value.length) % carouselExperiments.value.length)
-const farRightIndex = computed(() => (carouselIndex.value + 2) % carouselExperiments.value.length)
+const leftIndex = computed(
+  () =>
+    (carouselIndex.value - 1 + carouselExperiments.value.length) %
+    carouselExperiments.value.length
+);
+const rightIndex = computed(
+  () => (carouselIndex.value + 1) % carouselExperiments.value.length
+);
+const farLeftIndex = computed(
+  () =>
+    (carouselIndex.value - 2 + carouselExperiments.value.length) %
+    carouselExperiments.value.length
+);
+const farRightIndex = computed(
+  () => (carouselIndex.value + 2) % carouselExperiments.value.length
+);
 
 const get3DStyle = (idx: number) => {
   if (idx === carouselIndex.value) {
     return {
       zIndex: 3,
-      transform: 'translateX(0) scale(1.1) rotateY(0deg)',
-      filter: 'brightness(1.1) drop-shadow(0 0 24px #6366f1cc)',
+      transform: "translateX(0) scale(1.1) rotateY(0deg)",
+      filter: "brightness(1.1) drop-shadow(0 0 24px #6366f1cc)",
       opacity: 1,
-      pointerEvents: 'auto' as 'auto',
-    }
+      pointerEvents: "auto" as "auto",
+    };
   } else if (idx === leftIndex.value) {
     return {
       zIndex: 2,
-      transform: 'translateX(-60%) scale(0.85) rotateY(18deg)',
-      filter: 'blur(1px) brightness(0.9)',
+      transform: "translateX(-60%) scale(0.85) rotateY(18deg)",
+      filter: "blur(1px) brightness(0.9)",
       opacity: 0.7,
-      pointerEvents: 'auto' as 'auto',
-    }
+      pointerEvents: "auto" as "auto",
+    };
   } else if (idx === rightIndex.value) {
     return {
       zIndex: 2,
-      transform: 'translateX(60%) scale(0.85) rotateY(-18deg)',
-      filter: 'blur(1px) brightness(0.9)',
+      transform: "translateX(60%) scale(0.85) rotateY(-18deg)",
+      filter: "blur(1px) brightness(0.9)",
       opacity: 0.7,
-      pointerEvents: 'auto' as 'auto',
-    }
+      pointerEvents: "auto" as "auto",
+    };
   } else if (idx === farLeftIndex.value) {
     return {
       zIndex: 1,
-      transform: 'translateX(-120%) scale(0.7) rotateY(30deg)',
-      filter: 'blur(2.5px) brightness(0.7)',
+      transform: "translateX(-120%) scale(0.7) rotateY(30deg)",
+      filter: "blur(2.5px) brightness(0.7)",
       opacity: 0.3,
-      pointerEvents: 'auto' as 'auto',
-    }
+      pointerEvents: "auto" as "auto",
+    };
   } else if (idx === farRightIndex.value) {
     return {
       zIndex: 1,
-      transform: 'translateX(120%) scale(0.7) rotateY(-30deg)',
-      filter: 'blur(2.5px) brightness(0.7)',
+      transform: "translateX(120%) scale(0.7) rotateY(-30deg)",
+      filter: "blur(2.5px) brightness(0.7)",
       opacity: 0.3,
-      pointerEvents: 'auto' as 'auto',
-    }
+      pointerEvents: "auto" as "auto",
+    };
   } else {
     return {
       zIndex: 0,
       opacity: 0,
-      pointerEvents: 'none' as 'none',
-      transform: 'scale(0.5)'
-    }
+      pointerEvents: "none" as "none",
+      transform: "scale(0.5)",
+    };
   }
-}
+};
 
 // 生命周期
 onMounted(() => {
-  fetchExperiments()
-  startCarouselAuto()
-})
+  fetchExperiments();
+  startCarouselAuto();
+});
 onUnmounted(() => {
-  stopCarouselAuto()
-})
+  stopCarouselAuto();
+});
 </script>
 
 <style scoped>
@@ -321,7 +378,6 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  
 }
 
 .header-content {
@@ -332,7 +388,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
 }
 
 .logo {
@@ -356,17 +411,20 @@ onUnmounted(() => {
   padding: 40px 32px 56px 32px;
   background: #fff;
   border-radius: 24px;
-  box-shadow: 0 4px 32px 0 rgba(124,58,237,0.04);
+  box-shadow: 0 4px 32px 0 rgba(124, 58, 237, 0.04);
 }
 @media (max-width: 1500px) {
-  .main { max-width: 96vw; padding: 24px 2vw 40px 2vw; }
+  .main {
+    max-width: 96vw;
+    padding: 24px 2vw 40px 2vw;
+  }
 }
 
 .category-filter {
   margin-bottom: 16px;
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(60,60,120,0.04);
+  box-shadow: 0 2px 8px rgba(60, 60, 120, 0.04);
   padding: 12px 24px 0 24px;
 }
 
@@ -379,8 +437,8 @@ onUnmounted(() => {
 .sort-options {
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 2px 12px rgba(124,58,237,0.04);
-  border: 1.5px solid #A5B4FC;
+  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.04);
+  border: 1.5px solid #a5b4fc;
   padding: 16px 32px;
   margin-bottom: 32px;
 }
@@ -388,9 +446,11 @@ onUnmounted(() => {
   border-radius: 18px !important;
   background: #f6f7fb;
   color: #6366f1;
-  border: 1.5px solid #A5B4FC;
+  border: 1.5px solid #a5b4fc;
   font-weight: 600;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 .sort-group .el-radio-button__orig-radio:checked + .el-radio-button__inner {
   background: linear-gradient(135deg, #a5b4fc 0%, #7c3aed 100%);
@@ -404,7 +464,11 @@ onUnmounted(() => {
 
 .el-row {
   border-radius: 32px;
-  background: linear-gradient(135deg, rgba(124,58,237,0.07) 0%, rgba(99,102,241,0.09) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.07) 0%,
+    rgba(99, 102, 241, 0.09) 100%
+  );
   backdrop-filter: blur(18px) saturate(1.15);
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
   padding: 24px 12px;
@@ -413,10 +477,14 @@ onUnmounted(() => {
 
 .experiment-card {
   border-radius: 28px;
-  box-shadow: 0 4px 24px rgba(124,58,237,0.08);
-  background: rgba(255,255,255,0.75);
-  border: 1.5px solid #A5B4FC;
-  transition: box-shadow 0.3s, border 0.2s, background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.08);
+  background: rgba(255, 255, 255, 0.75);
+  border: 1.5px solid #a5b4fc;
+  transition:
+    box-shadow 0.3s,
+    border 0.2s,
+    background 0.3s,
+    transform 0.2s;
   overflow: hidden;
   cursor: pointer;
   margin-bottom: 32px;
@@ -428,10 +496,10 @@ onUnmounted(() => {
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
 }
 .experiment-card:hover {
-  box-shadow: 0 12px 48px rgba(124,58,237,0.18);
-  border: 1.5px solid #7C3AED;
+  box-shadow: 0 12px 48px rgba(124, 58, 237, 0.18);
+  border: 1.5px solid #7c3aed;
   transform: translateY(-6px) scale(1.04);
-  background: rgba(255,255,255,0.92);
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .experiment-image {
@@ -460,8 +528,15 @@ onUnmounted(() => {
 
 .experiment-overlay {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(180deg,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.18) 100%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
   opacity: 0;
   transition: opacity 0.3s;
   display: flex;
@@ -489,7 +564,7 @@ onUnmounted(() => {
 .experiment-title {
   font-size: 22px;
   font-weight: 700;
-  color: #7C3AED;
+  color: #7c3aed;
   margin-bottom: 8px;
   white-space: nowrap;
   overflow: hidden;
@@ -537,8 +612,8 @@ onUnmounted(() => {
 .system-intro {
   background: #fff;
   border-radius: 24px;
-  box-shadow: 0 2px 12px rgba(124,58,237,0.04);
-  border: 1.5px solid #A5B4FC;
+  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.04);
+  border: 1.5px solid #a5b4fc;
   padding: 48px 32px 32px 32px;
   margin-top: 48px;
 }
@@ -552,20 +627,22 @@ onUnmounted(() => {
   flex: 1;
   background: linear-gradient(135deg, #f8f8fe 0%, #ede9fe 100%);
   border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(124,58,237,0.04);
-  border: 1.5px solid #A5B4FC;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.04);
+  border: 1.5px solid #a5b4fc;
   padding: 36px 18px;
   text-align: center;
-  transition: box-shadow 0.3s, transform 0.3s;
+  transition:
+    box-shadow 0.3s,
+    transform 0.3s;
   color: #3b2177;
 }
 .feature-item:hover {
-  box-shadow: 0 8px 32px rgba(124,58,237,0.10);
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.1);
   transform: translateY(-4px) scale(1.04);
 }
 .feature-icon {
   font-size: 44px;
-  color: #7C3AED;
+  color: #7c3aed;
   margin-bottom: 16px;
 }
 .feature-item h3 {
@@ -582,7 +659,7 @@ onUnmounted(() => {
 
 .footer {
   background: #fff;
-  border-top: 1.5px solid #A5B4FC;
+  border-top: 1.5px solid #a5b4fc;
   padding: 24px 0;
   text-align: center;
   color: #6366f1;
@@ -590,7 +667,7 @@ onUnmounted(() => {
   margin-top: 64px;
 }
 .footer-links a {
-  color: #7C3AED;
+  color: #7c3aed;
   text-decoration: none;
   font-size: 14px;
   transition: color 0.2s;
@@ -617,7 +694,9 @@ onUnmounted(() => {
   height: 470px;
   margin: 0 auto;
   /* background: linear-gradient(135deg, #e0e7ef 0%, #f1f5f9 100%); */
-  box-shadow: 0 8px 32px 0 #a5b4fc33, 0 2px 8px #7c3aed22;
+  box-shadow:
+    0 8px 32px 0 #a5b4fc33,
+    0 2px 8px #7c3aed22;
   position: relative;
   overflow: visible;
   border: none;
@@ -655,7 +734,9 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   border-radius: 22px;
-  transition: box-shadow 0.4s, filter 0.4s;
+  transition:
+    box-shadow 0.4s,
+    filter 0.4s;
   box-shadow: none !important;
   filter: none !important;
 }
@@ -665,8 +746,14 @@ onUnmounted(() => {
 }
 .carousel-caption-3d {
   position: absolute;
-  left: 0; right: 0; bottom: 0;
-  background: linear-gradient(180deg,rgba(124,58,237,0.10) 0%,rgba(0,0,0,0.28) 100%);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(124, 58, 237, 0.1) 0%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
   color: #fff;
   font-size: 28px;
   font-weight: 700;
@@ -681,7 +768,7 @@ onUnmounted(() => {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255,255,255,0.7);
+  background: rgba(255, 255, 255, 0.7);
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -690,33 +777,46 @@ onUnmounted(() => {
   color: #6366f1;
   z-index: 3;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(60,60,120,0.10);
+  box-shadow: 0 2px 8px rgba(60, 60, 120, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
 }
-.carousel-control.prev { left: 16px; }
-.carousel-control.next { right: 16px; }
-.carousel-control:hover { background: #6366f1; color: #fff; }
+.carousel-control.prev {
+  left: 16px;
+}
+.carousel-control.next {
+  right: 16px;
+}
+.carousel-control:hover {
+  background: #6366f1;
+  color: #fff;
+}
 .carousel-indicators {
   position: absolute;
-  left: 0; right: 0; bottom: 16px;
+  left: 0;
+  right: 0;
+  bottom: 16px;
   display: flex;
   justify-content: center;
   gap: 10px;
   z-index: 4;
 }
 .indicator {
-  width: 14px; height: 14px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #e0e7ef;
   border: 2px solid #a5b4fc;
-  transition: background 0.3s, border 0.3s, transform 0.3s;
+  transition:
+    background 0.3s,
+    border 0.3s,
+    transform 0.3s;
 }
 .indicator.active {
-  background: #7C3AED;
-  border-color: #7C3AED;
+  background: #7c3aed;
+  border-color: #7c3aed;
   transform: scale(1.3);
 }
 .fancy-btn {
@@ -724,7 +824,9 @@ onUnmounted(() => {
   color: #fff;
   border: none;
   box-shadow: 0 2px 8px #6366f1cc;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 .fancy-btn:hover {
   background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
@@ -740,20 +842,28 @@ onUnmounted(() => {
   border: 2.5px solid #a5b4fc;
   box-shadow: 0 2px 8px #a5b4fc33;
   opacity: 0.7;
-  transition: background 0.3s, border 0.3s, transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+  transition:
+    background 0.3s,
+    border 0.3s,
+    transform 0.3s,
+    box-shadow 0.3s,
+    opacity 0.3s;
   cursor: pointer;
 }
 .carousel-indicators .indicator.active {
   background: linear-gradient(135deg, #7c3aed 0%, #a5b4fc 100%);
   border-color: #7c3aed;
-  box-shadow: 0 0 16px 4px #a5b4fc88, 0 0 0 4px #fff8;
+  box-shadow:
+    0 0 16px 4px #a5b4fc88,
+    0 0 0 4px #fff8;
   opacity: 1;
   transform: scale(1.25);
 }
 
 /* 响应式设计 */
 @media (max-width: 1600px) {
-  .experiment-carousel-container, .fancy-carousel {
+  .experiment-carousel-container,
+  .fancy-carousel {
     max-width: 98vw;
   }
   .carousel-item-3d {
@@ -764,7 +874,8 @@ onUnmounted(() => {
   }
 }
 @media (max-width: 1100px) {
-  .experiment-carousel-container, .fancy-carousel {
+  .experiment-carousel-container,
+  .fancy-carousel {
     max-width: 75vw;
   }
   .carousel-item-3d {
@@ -781,9 +892,21 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
-  .carousel-item-3d, .carousel-img-3d { width: 350px; height: 200px; margin-left: -175px; border-radius: 14px; }
-  .carousel-caption-3d { font-size: 15px; padding: 10px 16px 8px 16px; border-radius: 0 0 14px 14px; }
-  .fancy-carousel { height: 220px; }
+  .carousel-item-3d,
+  .carousel-img-3d {
+    width: 350px;
+    height: 200px;
+    margin-left: -175px;
+    border-radius: 14px;
+  }
+  .carousel-caption-3d {
+    font-size: 15px;
+    padding: 10px 16px 8px 16px;
+    border-radius: 0 0 14px 14px;
+  }
+  .fancy-carousel {
+    height: 220px;
+  }
 }
 @media (max-width: 768px) {
   .main {
@@ -820,15 +943,39 @@ onUnmounted(() => {
     flex-direction: column;
     text-align: center;
   }
-  .fancy-carousel { height: 180px; }
-  .carousel-item-3d, .carousel-img-3d { width: 220px; height: 140px; margin-left: -110px; border-radius: 14px; }
-  .carousel-caption-3d { font-size: 15px; padding: 10px 16px 8px 16px; border-radius: 0 0 14px 14px; }
+  .fancy-carousel {
+    height: 180px;
+  }
+  .carousel-item-3d,
+  .carousel-img-3d {
+    width: 220px;
+    height: 140px;
+    margin-left: -110px;
+    border-radius: 14px;
+  }
+  .carousel-caption-3d {
+    font-size: 15px;
+    padding: 10px 16px 8px 16px;
+    border-radius: 0 0 14px 14px;
+  }
 }
 
 @media (max-width: 600px) {
-  .carousel-item-3d, .carousel-img-3d { width: 200px; height: 110px; margin-left: -100px; border-radius: 8px; }
-  .carousel-caption-3d { font-size: 11px; padding: 6px 8px 4px 8px; border-radius: 0 0 8px 8px; }
-  .fancy-carousel { height: 120px; }
+  .carousel-item-3d,
+  .carousel-img-3d {
+    width: 200px;
+    height: 110px;
+    margin-left: -100px;
+    border-radius: 8px;
+  }
+  .carousel-caption-3d {
+    font-size: 11px;
+    padding: 6px 8px 4px 8px;
+    border-radius: 0 0 8px 8px;
+  }
+  .fancy-carousel {
+    height: 120px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -860,9 +1007,21 @@ onUnmounted(() => {
   .stat {
     font-size: 12px;
   }
-  .fancy-carousel { height: 120px; }
-  .carousel-item-3d, .carousel-img-3d { width: 120px; height: 80px; margin-left: -60px; border-radius: 10px; }
-  .carousel-caption-3d { font-size: 12px; padding: 6px 8px 4px 8px; border-radius: 0 0 10px 10px; }
+  .fancy-carousel {
+    height: 120px;
+  }
+  .carousel-item-3d,
+  .carousel-img-3d {
+    width: 120px;
+    height: 80px;
+    margin-left: -60px;
+    border-radius: 10px;
+  }
+  .carousel-caption-3d {
+    font-size: 12px;
+    padding: 6px 8px 4px 8px;
+    border-radius: 0 0 10px 10px;
+  }
 }
 
 .empty-state {
@@ -876,17 +1035,19 @@ onUnmounted(() => {
   left: 24px;
   z-index: 200;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(60,60,120,0.08);
+  box-shadow: 0 2px 8px rgba(60, 60, 120, 0.08);
   border-radius: 50%;
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: box-shadow 0.2s, background 0.2s;
+  transition:
+    box-shadow 0.2s,
+    background 0.2s;
 }
 .back-btn:hover {
   background: #f1f5f9;
-  box-shadow: 0 4px 16px rgba(60,60,120,0.16);
+  box-shadow: 0 4px 16px rgba(60, 60, 120, 0.16);
 }
-</style> 
+</style>

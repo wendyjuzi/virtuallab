@@ -22,16 +22,16 @@
 
     <div class="grid">
       <div
-        v-for="item in projects"
-        :key="item.id"
-        class="card"
-        @click="goToDetail(item.id)"
-        role="button"
-        tabindex="0"
-        @keydown.enter="goToDetail(item.id)"
+          v-for="item in projects"
+          :key="item.id"
+          class="card"
+          @click="goToDetail(item.id)"
+          role="button"
+          tabindex="0"
+          @keydown.enter="goToDetail(item.id)"
       >
         <div class="image-wrapper">
-<img :src="getFullUrl(item.imageUrl)" alt="cover" />
+          <img :src="getFullUrl(item.imageUrl)" alt="cover" />
         </div>
         <p class="project-name">{{ item.name }}</p>
       </div>

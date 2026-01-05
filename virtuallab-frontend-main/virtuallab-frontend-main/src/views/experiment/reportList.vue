@@ -2,6 +2,13 @@
   <div class="report-list-container">
     <!-- 头部导航栏 -->
     <div class="report-navbar">
+      <!-- 返回按钮 -->
+      <div class="back-button-container">
+        <button class="back-button" @click="goBack">
+          <i class="back-icon">←</i>
+          返回
+        </button>
+      </div>
       <div class="navbar-brand">
         <i class="icon-lab"></i>
         <span>虚拟实验室管理系统</span>
@@ -19,7 +26,11 @@
         <h2>我的实验报告</h2>
         <div class="list-meta">
           <span>共 {{ reports.length }} 份报告</span>
-          <el-select v-model="filterStatus" placeholder="筛选状态" style="width: 120px">
+          <el-select
+            v-model="filterStatus"
+            placeholder="筛选状态"
+            style="width: 120px"
+          >
             <el-option label="全部" value="all"></el-option>
             <el-option label="草稿" value="DRAFT"></el-option>
             <el-option label="已保存" value="SAVED"></el-option>
@@ -32,10 +43,10 @@
       <!-- 报告列表 -->
       <div class="report-cards">
         <el-card
-            v-for="report in filteredReports"
-            :key="report.id"
-            class="report-card"
-            @click="viewReport(report.sessionId)"
+          v-for="report in filteredReports"
+          :key="report.id"
+          class="report-card"
+          @click="viewReport(report.sessionId)"
         >
           <div class="card-header">
             <h3>{{ report.title }}</h3>
@@ -59,7 +70,11 @@
             </div>
           </div>
           <div class="card-footer">
-            <el-button type="primary" size="small" @click.stop="viewReport(report.sessionId)">
+            <el-button
+              type="primary"
+              size="small"
+              @click.stop="viewReport(report.sessionId)"
+            >
               查看详情
             </el-button>
           </div>
@@ -79,129 +94,128 @@
 </template>
 
 <script>
-import {ref, computed, onMounted} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import { ElMessage } from 'element-plus'
-import {getSubmittedAndGradedReports, getReportList} from "@/api/experiment";
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { getSubmittedAndGradedReports, getReportList } from "@/api/experiment";
 
 export default {
   setup() {
-    const router = useRouter()
-    const route = useRoute()
-    const studentId = ref(route.params.studentId)
-    const filterStatus = ref('all')
-    const loading = ref(false)
-    const reports = ref([])
+    const router = useRouter();
+    const route = useRoute();
+    const studentId = ref(route.params.studentId);
+    const filterStatus = ref("all");
+    const loading = ref(false);
+    const reports = ref([]);
 
-    console.log('当前studentId:', studentId.value)
+    console.log("当前studentId:", studentId.value);
 
     // 获取学生信息
     const fetchStudentInfo = async () => {
-      const res = await fetch('/user/profile')
-      console.log("API响应状态:",res.status)
-      const data = await res.json()
-      console.log("完整API响应",data)
+      const res = await fetch("/user/profile");
+      console.log("API响应状态:", res.status);
+      const data = await res.json();
+      console.log("完整API响应", data);
       if (data.code === 200) {
-        studentInfo.value = data.data
-        console.log("获取到的学生信息:",studentInfo.value)
-      }else{
-        console.error("API返回错误:",data.message)
+        studentInfo.value = data.data;
+        console.log("获取到的学生信息:", studentInfo.value);
+      } else {
+        console.error("API返回错误:", data.message);
       }
-    }
+    };
 
     // 从API中获取报告列表
     const fetchReports = async () => {
-      loading.value = true
+      loading.value = true;
       try {
         let apiResponse;
 
         if (studentId.value) {
           // 如果有studentId，获取该学生的报告
-          apiResponse = await getReportList(studentId.value)
-          console.log('获取特定学生报告:', apiResponse)
+          apiResponse = await getReportList(studentId.value);
+          console.log("获取特定学生报告:", apiResponse);
         } else {
           // 如果没有studentId，获取所有已提交的报告
-          apiResponse = await getSubmittedAndGradedReports()
-          console.log('获取所有已提交报告:', apiResponse)
+          apiResponse = await getSubmittedAndGradedReports();
+          console.log("获取所有已提交报告:", apiResponse);
         }
 
-        reports.value = apiResponse || []
-        ElMessage.success(studentId.value
-            ? '学生报告列表加载成功'
-            : '所有已提交报告加载成功')
-
+        reports.value = apiResponse || [];
+        ElMessage.success(
+          studentId.value ? "学生报告列表加载成功" : "所有已提交报告加载成功"
+        );
       } catch (error) {
-        console.error('加载报告列表失败:', error)
-        ElMessage.error('加载报告列表失败:' + (error.message || '未知错误'))
-        reports.value = []
+        console.error("加载报告列表失败:", error);
+        ElMessage.error("加载报告列表失败:" + (error.message || "未知错误"));
+        reports.value = [];
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
-
+    };
 
     // 过滤后的报告列表
     const filteredReports = computed(() => {
-      if (filterStatus.value === 'all') {
-        return reports.value
+      if (filterStatus.value === "all") {
+        return reports.value;
       }
-      return reports.value.filter(report => report.status === filterStatus.value)
-    })
+      return reports.value.filter(
+        (report) => report.status === filterStatus.value
+      );
+    });
 
     // 格式化日期
     const formatDate = (dateString) => {
-      if (!dateString) return '未知'
-      const date = new Date(dateString)
-      return date.toLocaleDateString('zh-CN')
-    }
+      if (!dateString) return "未知";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("zh-CN");
+    };
 
     // 格式化状态
     const formatStatus = (status) => {
       const statusMap = {
-        'DRAFT': '草稿',
-        'SAVED': '已保存',
-        'SUBMITTED': '已提交',
-        'GRADED': '已评分'
-      }
-      return statusMap[status] || status
-    }
+        DRAFT: "草稿",
+        SAVED: "已保存",
+        SUBMITTED: "已提交",
+        GRADED: "已评分",
+      };
+      return statusMap[status] || status;
+    };
 
     // 获取状态标签类型
     const getStatusTagType = (status) => {
       const typeMap = {
-        'DRAFT': 'info',
-        'SAVED': '',
-        'SUBMITTED': 'warning',
-        'GRADED': 'success'
-      }
-      return typeMap[status] || ''
-    }
+        DRAFT: "info",
+        SAVED: "",
+        SUBMITTED: "warning",
+        GRADED: "success",
+      };
+      return typeMap[status] || "";
+    };
 
     // 截断内容预览
     const truncateContent = (content) => {
-      if (!content) return '暂无内容'
-      return content.length > 100 ? content.substring(0, 100) + '...' : content
-    }
+      if (!content) return "暂无内容";
+      return content.length > 100 ? content.substring(0, 100) + "..." : content;
+    };
 
     // 查看报告详情
     const viewReport = (sessionId) => {
-      router.push(`/experiment/report/${sessionId}`)
-    }
-
+      router.push(`/experiment/report/${sessionId}`);
+    };
     // 刷新列表
     const refreshList = () => {
-      ElMessage.success('报告列表已刷新')
-    }
+      ElMessage.success("报告列表已刷新");
+    };
 
     // 创建新报告
     const createNewReport = () => {
-      ElMessage.info('创建新报告功能待实现')
-    }
-
+      ElMessage.info("创建新报告功能待实现");
+    };
+    const goBack = () => router.back();
     // 初始化加载数据
     onMounted(() => {
-      fetchReports()
-    })
+      fetchReports();
+    });
 
     return {
       fetchStudentInfo,
@@ -216,10 +230,11 @@ export default {
       refreshList,
       createNewReport,
       fetchReports,
-      getSubmittedAndGradedReports
-    }
-  }
-}
+      getSubmittedAndGradedReports,
+      goBack,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -390,24 +405,60 @@ export default {
 .loading-state i {
   font-size: 40px;
   margin-bottom: 15px;
-  color: #409EFF;
+  color: #409eff;
   animation: rotating 2s linear infinite;
 }
 
 @keyframes rotating {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
 
 /* 图标样式 */
 [class^="icon-"] {
   font-style: normal;
 }
 
-.icon-lab:before { content: "🧪"; }
-.icon-refresh:before { content: "🔄"; }
-.icon-calendar:before { content: "📅"; }
-.icon-update:before { content: "⏱️"; }
-.icon-empty:before { content: "📭"; }
+.icon-lab:before {
+  content: "🧪";
+}
+.icon-refresh:before {
+  content: "🔄";
+}
+.icon-calendar:before {
+  content: "📅";
+}
+.icon-update:before {
+  content: "⏱️";
+}
+.icon-empty:before {
+  content: "📭";
+}
+
+.back-button {
+  background-color: color-mix(in srgb, #764ba2, transparent 60%);
+  color: #fff;
+  padding: 5px 13px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  display: flex;
+  align-content: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-button:hover {
+  background-color: color-mix(in srgb, #764ba2, transparent 40%);
+  transform: translateY(-1.5px);
+  /* https://smoothshadows.com/#djEsMSwxLDAuMSwyNCwxMSwwLCMwMzA3MTIsI2YzZjRmNiwjZmZmZmZmLDI%3D */
+  box-shadow: 0px 5px 10px rgba(3, 7, 18, 0.1);
+}
 </style>

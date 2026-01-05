@@ -1299,7 +1299,7 @@ userStore.initUser()
   background: linear-gradient(135deg, #ececff 0%, #f8f8ff 100%);
   min-height: 100vh;
   margin-top:-22px;
-  margin-left:-22px;
+  
   margin-right:-22px;
 }
 

@@ -3,12 +3,16 @@
     <div class="header">
       <h1>学生实验平台</h1>
       <div class="user-info" v-if="studentInfo">
-        <span>欢迎，{{ studentInfo.realName }}（{{ studentInfo.username }}）</span>
+        <span
+          >欢迎，{{ studentInfo.realName }}（{{ studentInfo.username }}）</span
+        >
         <span>学号：{{ studentInfo.studentId }}</span>
-        <span>院系：{{ studentInfo.department }}</span>
-        <span>专业：{{ studentInfo.major }}</span>
-        <span class="role">{{ userStore.userRole }}</span>
-        <el-button @click="goToProfile" type="primary" style="margin-top: 8px;">查看个人信息</el-button>
+        <span>院系：{{ studentInfo.department }} 计算机</span>
+        <span>专业：{{ studentInfo.major }} 计算机</span>
+        <span class="role">{{ userStore.userRole && "学生" }}</span>
+        <el-button @click="goToProfile" type="primary" style="margin-top: 8px"
+          >查看个人信息</el-button
+        >
       </div>
     </div>
 
@@ -40,42 +44,79 @@
       <!-- 左下：进度展示 -->
       <div class="progress-section">
         <div class="particles">
-          <div class="particle" v-for="n in 10" :key="n" :style="{
-            left: Math.random() * 100 + '%',
-            animationDelay: Math.random() * 2 + 's'
-          }"></div>
+          <div
+            class="particle"
+            v-for="n in 10"
+            :key="n"
+            :style="{
+              left: Math.random() * 100 + '%',
+              animationDelay: Math.random() * 2 + 's',
+            }"
+          ></div>
         </div>
-        <h2>Learning Progress</h2>
+        <h2>学习进度</h2>
         <div class="progress-circle">
           <svg width="120" height="120">
             <defs>
-              <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient
+                id="progressGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
                 <stop offset="0%" stop-color="#fff" />
                 <stop offset="100%" stop-color="#f0f0f0" />
               </linearGradient>
             </defs>
-            <circle cx="60" cy="60" r="50" stroke="#e5e7eb" stroke-width="12" fill="none" />
-            <circle cx="60" cy="60" r="50" stroke="url(#progressGradient)" stroke-width="12" fill="none"
+            <circle
+              cx="60"
+              cy="60"
+              r="50"
+              stroke="#e5e7eb"
+              stroke-width="12"
+              fill="none"
+            />
+            <circle
+              cx="60"
+              cy="60"
+              r="50"
+              stroke="url(#progressGradient)"
+              stroke-width="12"
+              fill="none"
               :stroke-dasharray="circumference"
-              :stroke-dashoffset="circumference - circumference * progressPercentage / 100"
+              :stroke-dashoffset="
+                circumference - (circumference * progressPercentage) / 100
+              "
               stroke-linecap="round"
-              style="transition: stroke-dashoffset 1s cubic-bezier(.4,2,.6,1)"
-              :style="{ '--progress': progressPercentage + '%' }"/>
-            <text x="60" y="68" text-anchor="middle" font-size="28" class = "progress-percentage" >{{ progressPercentage }}%</text>
+              style="
+                transition: stroke-dashoffset 1s cubic-bezier(0.4, 2, 0.6, 1);
+              "
+              :style="{ '--progress': progressPercentage + '%' }"
+            />
+            <text
+              x="60"
+              y="68"
+              text-anchor="middle"
+              font-size="28"
+              class="progress-percentage"
+            >
+              {{ progressPercentage }}%
+            </text>
           </svg>
         </div>
         <div class="progress-stats">
           <div class="stat-item">
             <div class="stat-value">{{ stats.completedExperiments }}</div>
-            <div class="stat-label">Completed</div>
+            <div class="stat-label">已完成</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ stats.myExperiments }}</div>
-            <div class="stat-label">In Progress</div>
+            <div class="stat-label">进行中</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">25h</div>
-            <div class="stat-label">Study Time</div>
+            <div class="stat-label">学习时长</div>
           </div>
         </div>
         <!-- <div class="next-milestone">
@@ -89,16 +130,22 @@
 
       <!-- 中上：实验管理 -->
       <div class="main-section">
-        <h2>Experiment Management</h2>
+        <h2>实验管理</h2>
         <div class="experiment-grid">
-          <div class="experiment-card" @click="navigateTo('/student/experiments')">
+          <div
+            class="experiment-card"
+            @click="navigateTo('/student/experiments')"
+          >
             <div class="card-icon">🧪</div>
             <div class="card-content">
               <h3>我的实验</h3>
               <p>查看和管理我的实验项目</p>
             </div>
           </div>
-          <div class="experiment-card" @click="navigateTo(`/experiment/students/${studentId}/reports`)">
+          <div
+            class="experiment-card"
+            @click="navigateTo(`/experiment/students/${studentId}/reports`)"
+          >
             <div class="card-icon">📝</div>
             <div class="card-content">
               <h3>实验报告</h3>
@@ -110,7 +157,7 @@
 
       <!-- 中下：快捷操作 -->
       <div class="quick-actions">
-        <h2>QUICK</h2>
+        <h2>快速导航</h2>
         <div class="action-buttons">
           <button class="action-btn" @click="enterLab">实验室预约</button>
           <button class="action-btn" @click="goToChatRooms">我的聊天室</button>
@@ -140,59 +187,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import { useUserStore } from '@/store/user'
-import AiAssistant from '@/components/AiAssistant.vue'
-import {storeToRefs} from "pinia";
-import { getStudentExperiments } from '@/api/request';
+import { ref, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useUserStore } from "@/store/user";
+import AiAssistant from "@/components/AiAssistant.vue";
+import { storeToRefs } from "pinia";
+import { getStudentExperiments } from "@/api/request";
 
-const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
-const { user } = storeToRefs(userStore)
-
+const router = useRouter();
+const route = useRoute();
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
 
 // 获取studentId
-const userId = computed(() => user.value?.id)
-const studentId = computed(() => user.value?.studentId)
-console.log("当前用户id:", userId.value)
-console.log("当前studentId:", studentId.value)
+const userId = computed(() => user.value?.id);
+const studentId = computed(() => user.value?.studentId);
+console.log("当前用户id:", userId.value);
+console.log("当前studentId:", studentId.value);
 
-const studentInfo = ref<any>(null)
+const studentInfo = ref<any>(null);
 
 const stats = ref({
   myExperiments: 0,
   completedExperiments: 0,
-  averageScore: 0
-})
+  averageScore: 0,
+});
 
-const quickList = ref<any[]>([])
-const notices = ref<any[]>([])
-const circumference = 2 * Math.PI * 500
-
+const quickList = ref<any[]>([]);
+const notices = ref<any[]>([]);
+const circumference = 2 * Math.PI * 500;
 
 const fetchStudentInfo = async () => {
-  const res = await fetch(`/user/profile/${userId.value}`)
-  console.log("res值为:",res)
-  console.log("API响应状态:",res.status)
-  const data = await res.json()
-  console.log("完整API响应",data)
+  const res = await fetch(`/user/profile/${userId.value}`);
+  console.log("res值为:", res);
+  console.log("API响应状态:", res.status);
+  const data = await res.json();
+  console.log("完整API响应", data);
   if (data.code === 200) {
-    studentInfo.value = data.data
-    console.log("获取到的学生信息:",studentInfo.value)
-  }else{
-    console.error("API返回错误:",data.message)
+    studentInfo.value = data.data;
+    console.log("获取到的学生信息:", studentInfo.value);
+  } else {
+    console.error("API返回错误:", data.message);
   }
-}
+};
 
 const goToChatRooms = () => {
-  router.push('/student/chat-room')
-}
+  router.push("/student/chat-room");
+};
 
 const progressPercentage = computed(() => {
   if (stats.value.myExperiments === 0) return 0; // 避免除以0
-  return Math.round((stats.value.completedExperiments / stats.value.myExperiments) * 100);
+  return Math.round(
+    (stats.value.completedExperiments / stats.value.myExperiments) * 100
+  );
 });
 
 // 获取实验数据并更新统计信息
@@ -201,94 +248,114 @@ const fetchExperiments = async () => {
     const res = await getStudentExperiments({
       userId: userId.value,
       pageNum: 1,
-      pageSize: 1000
-    })
+      pageSize: 1000,
+    });
 
     if (res.code === 200 && res.data) {
       // 更新统计数据
       stats.value = {
         myExperiments: res.data.totalExperiments,
         completedExperiments: res.data.completedExperiments,
-        averageScore: res.data.averageScore || 0
+        averageScore: res.data.averageScore || 0,
       };
 
       console.log("实验统计数据:", {
         总数: stats.value.myExperiments,
         已完成: stats.value.completedExperiments,
-        平均分: stats.value.averageScore
+        平均分: stats.value.averageScore,
       });
 
       // 如果需要使用分页数据
       const experiments = res.data.pageData.records;
       console.log("实验列表数据:", experiments);
-      }
+    }
   } catch (error) {
-    console.error('获取实验数据失败:', error);
+    console.error("获取实验数据失败:", error);
   }
 };
 const enterLab = () => {
-  router.push('/student/LabReservation')
-}
+  router.push("/student/LabReservation");
+};
 const goToLikeFavorite = () => {
-  router.push('/student/like-favorite')
-}
+  router.push("/student/like-favorite");
+};
 const progressColor = computed(() => {
-  if (progressPercentage.value < 30) return '#ef4444'; // 红色
-  if (progressPercentage.value < 70) return '#f59e0b'; // 黄色
-  return '#10b981'; // 绿色
+  if (progressPercentage.value < 30) return "#ef4444"; // 红色
+  if (progressPercentage.value < 70) return "#f59e0b"; // 黄色
+  return "#10b981"; // 绿色
 });
 
 const fetchQuickList = () => {
   quickList.value = [
-    { icon: '🧪', title: '我的实验', desc: '查看和管理我的实验项目', action: () => router.push('/student/experiments') },
-    { icon: '📝', title: '实验报告', desc: '提交和查看实验报告', action: () => router.push(`/experiment/students/${studentId.value}/reports`) },
-    { icon: '📊', title: '成绩查询', desc: '查看实验成绩和评价', action: () => router.push('/student/scores') },
-    { icon: '❤️', title: '点赞收藏', desc: '管理我的点赞和收藏', action: () => router.push('/student/like-favorite') }
-  ]
-}
+    {
+      icon: "🧪",
+      title: "我的实验",
+      desc: "查看和管理我的实验项目",
+      action: () => router.push("/student/experiments"),
+    },
+    {
+      icon: "📝",
+      title: "实验报告",
+      desc: "提交和查看实验报告",
+      action: () =>
+        router.push(`/experiment/students/${studentId.value}/reports`),
+    },
+    {
+      icon: "📊",
+      title: "成绩查询",
+      desc: "查看实验成绩和评价",
+      action: () => router.push("/student/scores"),
+    },
+    {
+      icon: "❤️",
+      title: "点赞收藏",
+      desc: "管理我的点赞和收藏",
+      action: () => router.push("/student/like-favorite"),
+    },
+  ];
+};
 
 const fetchNotices = async () => {
-  const res = await fetch('/notice/list')
-  const data = await res.json()
+  const res = await fetch("/notice/list");
+  const data = await res.json();
   if (data.code === 200) {
-    notices.value = data.data
+    notices.value = data.data;
   }
-}
+};
 
 const navigateTo = (path: string) => {
-  router.push(path)
-}
+  router.push(path);
+};
 
 const startNewExperiment = () => {
-  console.log('开始新实验')
-}
+  console.log("开始新实验");
+};
 
 const viewSchedule = () => {
-  console.log('查看课表')
-}
+  console.log("查看课表");
+};
 
 const submitReport = () => {
-  console.log('提交报告')
-}
+  console.log("提交报告");
+};
 
 const viewProgress = () => {
-  console.log('查看进度')
-}
+  console.log("查看进度");
+};
 
 const goToProfile = () => {
-  router.push('/profile')
-}
+  router.push("/profile");
+};
 
 onMounted(() => {
-  if (!userStore.user?.roles?.includes('STUDENT')) {
-    router.push('/unauthorized')
+  if (!userStore.user?.roles?.includes("STUDENT")) {
+    router.push("/unauthorized");
   }
-  fetchStudentInfo()
-  fetchExperiments()
-  fetchQuickList()
-  fetchNotices()
-})
-
+  fetchStudentInfo();
+  fetchExperiments();
+  fetchQuickList();
+  fetchNotices();
+});
 </script>
 
 <style scoped>
@@ -298,14 +365,15 @@ onMounted(() => {
   padding: 24px;
   position: relative;
   overflow: hidden;
-  margin-top:-26px;
-  margin-left:-24px;
-  margin-right:-24px;
-  margin-bottom:-26px;
+  margin-top: -26px;
+
+  margin-right: -24px;
+  margin-bottom: -26px;
 }
 
-.student::before, .student::after {
-  content: '';
+.student::before,
+.student::after {
+  content: "";
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
@@ -319,7 +387,12 @@ onMounted(() => {
   height: 380px;
   left: -120px;
   top: -120px;
-  background: radial-gradient(circle at 30% 30%, #d8b4fe 0%, #a855f7 80%, transparent 100%);
+  background: radial-gradient(
+    circle at 30% 30%,
+    #d8b4fe 0%,
+    #a855f7 80%,
+    transparent 100%
+  );
 }
 
 .student::after {
@@ -327,7 +400,12 @@ onMounted(() => {
   height: 320px;
   right: -100px;
   bottom: -100px;
-  background: radial-gradient(circle at 70% 70%, #e9d5ff 0%, #c084fc 80%, transparent 100%);
+  background: radial-gradient(
+    circle at 70% 70%,
+    #e9d5ff 0%,
+    #c084fc 80%,
+    transparent 100%
+  );
 }
 
 .content {
@@ -429,8 +507,9 @@ onMounted(() => {
   grid-column: 1 / 2;
   grid-row: 2 / 3;
   padding: 28px;
-  background: linear-gradient(135deg, rgba(192, 132, 252, 0.9), rgba(216, 180, 254, 0.9)),
-              url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0icGF0dGVybiIgeD0iMCIgeT0iMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTTAgMGw2MCA2MG0wLTYwTC02MCA2MCIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMSkiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8L3BhdHRlcm4+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz4KPC9zdmc+');
+  background:
+    linear-gradient(135deg, rgba(192, 132, 252, 0.9), rgba(216, 180, 254, 0.9)),
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0icGF0dGVybiIgeD0iMCIgeT0iMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTTAgMGw2MCA2MG0wLTYwTC02MCA2MCIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMSkiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8L3BhdHRlcm4+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz4KPC9zdmc+");
   backdrop-filter: blur(10px);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -444,13 +523,17 @@ onMounted(() => {
 }
 
 .progress-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
   animation: pulse 4s ease-in-out infinite;
   border-radius: 16px;
 }
@@ -459,7 +542,7 @@ onMounted(() => {
   font-size: 24px;
   margin: 0 0 24px 0;
   color: white;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -476,14 +559,18 @@ onMounted(() => {
 
 .progress-circle::before,
 .progress-circle::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -15px;
   left: -15px;
   right: -15px;
   bottom: -15px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, rgba(255, 255, 255, 0.2) var(--progress), transparent 0);
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0.2) var(--progress),
+    transparent 0
+  );
   animation: rotate 3s linear infinite;
   z-index: -1;
 }
@@ -499,7 +586,7 @@ onMounted(() => {
 }
 
 .progress-circle circle {
-  transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .progress-circle circle:first-child {
@@ -517,7 +604,7 @@ onMounted(() => {
 .progress-circle text {
   transform: rotate(90deg);
   transform-origin: center;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   fill: white;
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
@@ -599,8 +686,9 @@ onMounted(() => {
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   padding: 28px;
-  background: linear-gradient(135deg, rgba(233, 213, 255, 0.9), rgba(243, 232, 255, 0.9)),
-              url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0icGF0dGVybiIgeD0iMCIgeT0iMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTTAgMGw2MCA2MG0wLTYwTC02MCA2MCIgc3Ryb2tlPSJyZ2JhKDIxNiwgMTgwLCAyNTQsIDAuMSkiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8L3BhdHRlcm4+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz4KPC9zdmc+');
+  background:
+    linear-gradient(135deg, rgba(233, 213, 255, 0.9), rgba(243, 232, 255, 0.9)),
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0icGF0dGVybiIgeD0iMCIgeT0iMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTTAgMGw2MCA2MG0wLTYwTC02MCA2MCIgc3Ryb2tlPSJyZ2JhKDIxNiwgMTgwLCAyNTQsIDAuMSkiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgICA8L3BhdHRlcm4+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz4KPC9zdmc+");
   backdrop-filter: blur(10px);
   border-radius: 16px;
   border: 1px solid rgba(233, 213, 255, 0.5);
@@ -613,7 +701,7 @@ onMounted(() => {
   font-size: 28px;
   margin: 0;
   color: #9333ea;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   letter-spacing: 1px;
   text-shadow: 0 0 10px rgba(233, 213, 255, 0.8);
@@ -639,7 +727,9 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.9);
   padding: 28px;
   border-radius: 12px;
-  transition: transform 0.2s, background-color 0.3s;
+  transition:
+    transform 0.2s,
+    background-color 0.3s;
   border: 1px solid rgba(233, 213, 255, 0.5);
   backdrop-filter: blur(5px);
   cursor: pointer;
@@ -669,7 +759,7 @@ onMounted(() => {
   color: #9333ea;
   font-size: 18px;
   margin: 0 0 8px 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
 }
 
@@ -703,7 +793,7 @@ onMounted(() => {
   line-height: 1;
   margin: 40px 0 0 0;
   color: #9333ea;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -714,7 +804,7 @@ onMounted(() => {
 }
 
 .quick-actions h2::after {
-  content: 'ACTIONS';
+  /* content: "ACTIONS"; */
   margin-top: 4px;
 }
 
@@ -740,21 +830,23 @@ onMounted(() => {
   transition: all 0.3s ease;
   background: #c084fc;
   color: white;
-  box-shadow: 0 0 20px rgba(192, 132, 252, 0.3),
-              inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 0 20px rgba(192, 132, 252, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
 }
 
 .action-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg,
+  background: linear-gradient(
+    45deg,
     rgba(192, 132, 252, 0.5),
     rgba(216, 180, 254, 0.5)
   );
@@ -766,8 +858,9 @@ onMounted(() => {
 .action-btn:hover {
   transform: translateY(-2px);
   background: #d8b4fe;
-  box-shadow: 0 0 30px rgba(192, 132, 252, 0.5),
-              inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 0 30px rgba(192, 132, 252, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .action-btn:hover::before {
@@ -790,7 +883,7 @@ onMounted(() => {
 }
 
 .ai-assistant-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 50%;
@@ -804,7 +897,7 @@ onMounted(() => {
 }
 
 .ai-assistant-section::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 8px;
   left: 50%;
@@ -825,7 +918,7 @@ onMounted(() => {
 }
 
 .ai-assistant-section h2::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 12px;
   right: 24px;
@@ -876,7 +969,9 @@ onMounted(() => {
   gap: 8px;
 }
 
-.signal-icon, .wifi-icon, .battery-icon {
+.signal-icon,
+.wifi-icon,
+.battery-icon {
   width: 16px;
   height: 16px;
   background: rgba(255, 255, 255, 0.9);
@@ -964,7 +1059,7 @@ onMounted(() => {
   font-weight: 600;
   color: white;
   margin-bottom: 4px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .stat-label {
@@ -1016,12 +1111,12 @@ onMounted(() => {
 }
 
 .progress-percentage {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 700;
   fill: white;
   text-shadow:
-      0 0 8px rgba(255, 255, 255, 0.8),
-      0 0 15px rgba(192, 132, 252, 0.6);
+    0 0 8px rgba(255, 255, 255, 0.8),
+    0 0 15px rgba(192, 132, 252, 0.6);
   animation: percentagePulse 2s ease-in-out infinite;
 }
 
@@ -1029,20 +1124,20 @@ onMounted(() => {
   0% {
     opacity: 0.9;
     text-shadow:
-        0 0 8px rgba(255, 255, 255, 0.8),
-        0 0 15px rgba(192, 132, 252, 0.6);
+      0 0 8px rgba(255, 255, 255, 0.8),
+      0 0 15px rgba(192, 132, 252, 0.6);
   }
   50% {
     opacity: 1;
     text-shadow:
-        0 0 12px rgba(255, 255, 255, 1),
-        0 0 20px rgba(192, 132, 252, 0.8);
+      0 0 12px rgba(255, 255, 255, 1),
+      0 0 20px rgba(192, 132, 252, 0.8);
   }
   100% {
     opacity: 0.9;
     text-shadow:
-        0 0 8px rgba(255, 255, 255, 0.8),
-        0 0 15px rgba(192, 132, 252, 0.6);
+      0 0 8px rgba(255, 255, 255, 0.8),
+      0 0 15px rgba(192, 132, 252, 0.6);
   }
 }
 </style>

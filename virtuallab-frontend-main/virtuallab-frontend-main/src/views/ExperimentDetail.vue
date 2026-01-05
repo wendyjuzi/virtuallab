@@ -24,20 +24,20 @@
       <div class="right">
         <p class="description">{{ project?.description }}</p>
         <el-button
-          v-if="project?.sceneJsonPath"
-          class="start-btn"
-          type="primary"
-          size="large"
-          @click="goTo3DExperiment"
+            v-if="project?.sceneJsonPath"
+            class="start-btn"
+            type="primary"
+            size="large"
+            @click="goTo3DExperiment"
         >
           🚀 开始实验
         </el-button>
         <el-button
-          v-else
-          class="start-btn"
-          type="primary"
-          size="large"
-          @click="startExperiment"
+            v-else
+            class="start-btn"
+            type="primary"
+            size="large"
+            @click="startExperiment"
         >
           🚀 开始实验
         </el-button>
@@ -83,10 +83,10 @@
           </div>
           <div class="comment-form">
             <el-input
-              v-model="newComment"
-              type="textarea"
-              placeholder="写下你的评论..."
-              :rows="3"
+                v-model="newComment"
+                type="textarea"
+                placeholder="写下你的评论..."
+                :rows="3"
             />
             <el-button type="primary" class="submit-btn" @click="submitComment" :loading="commentLoading" style="margin-top: 12px;">发表评论</el-button>
           </div>
@@ -94,12 +94,12 @@
       </el-card>
     </div>
     <ResourceShare
-      v-if="project"
-      v-model:visible="showShareDialog"
-      :resourceId="project.id"
-      :resourceTitle="project.name"
-      @shareSuccess="showShareDialog = false"
-      @close="showShareDialog = false"
+        v-if="project"
+        v-model:visible="showShareDialog"
+        :resourceId="project.id"
+        :resourceTitle="project.name"
+        @shareSuccess="showShareDialog = false"
+        @close="showShareDialog = false"
     />
   </div>
 </template>

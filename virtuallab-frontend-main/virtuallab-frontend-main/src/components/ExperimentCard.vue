@@ -18,10 +18,10 @@
         <div class="stat"><el-icon><Collection /></el-icon> {{ experiment.favorites || 0 }}</div>
       </div>
       <div class="experiment-actions" @click.stop>
-        <LikeFavoriteButton 
-          :experiment-id="experiment.id"
-          :initial-like-count="experiment.likes || 0"
-          :initial-favorite-count="experiment.favorites || 0"
+        <LikeFavoriteButton
+            :experiment-id="experiment.id"
+            :initial-like-count="experiment.likes || 0"
+            :initial-favorite-count="experiment.favorites || 0"
         />
       </div>
     </div>
