@@ -243,25 +243,33 @@ export default {
           : fetchEquipmentList
 
       fetchMethod(this.listQuery).then(response => {
-        this.list = response.data.records.map(item => ({
-          id: item.equipmentId,
-          name: item.equipmentName,
-          model: item.model,
-          category: item.category,
-          code: item.serialNumber,
-          labId: item.labId,
-          price: item.price ? new Number(item.price) : null,
-          manufacturer: item.manufacturer,
-          status: this.mapStatus(item.status),
-          description: item.description,
-          labName: this.getLabNameById(item.labId),
-          department: this.listQuery.department
-        }))
-
-        this.total = response.data.total
+        // 添加空值检查，防止 response.data 为 null
+        if (response && response.data) {
+          const records = response.data.records || []
+          this.list = records.map(item => ({
+            id: item.equipmentId,
+            name: item.equipmentName,
+            model: item.model,
+            category: item.category,
+            code: item.serialNumber,
+            labId: item.labId,
+            price: item.price ? new Number(item.price) : null,
+            manufacturer: item.manufacturer,
+            status: this.mapStatus(item.status),
+            description: item.description,
+            labName: this.getLabNameById(item.labId),
+            department: this.listQuery.department
+          }))
+          this.total = response.data.total || 0
+        } else {
+          this.list = []
+          this.total = 0
+        }
         this.listLoading = false
       }).catch(error => {
         console.error('获取设备列表失败:', error)
+        this.list = []
+        this.total = 0
         this.listLoading = false
       })
     },

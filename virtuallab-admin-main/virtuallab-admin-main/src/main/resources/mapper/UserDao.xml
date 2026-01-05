@@ -239,6 +239,7 @@
     </select>
 
     <!-- 条件查询用户（分页） -->
+    <!-- 注意：userType 参数已移除，因为 user 表中没有 user_type 字段，用户类型需要通过角色关联查询 -->
     <select id="findByConditions" resultMap="BaseResultMap">
         SELECT * FROM user
         WHERE 1=1
@@ -251,9 +252,9 @@
         <if test="department != null and department != ''">
             AND department = #{department}
         </if>
-        <if test="userType != null and userType != ''">
+        <!-- <if test="userType != null and userType != ''">
             AND user_type = #{userType}
-        </if>
+        </if> -->
         <if test="status != null">
             AND status = #{status}
         </if>
@@ -305,6 +306,7 @@
     </delete>
 
     <!-- 关键字聚合搜索专用 -->
+    <!-- 注意：userType 参数已移除，因为 user 表中没有 user_type 字段，用户类型需要通过角色关联查询 -->
     <select id="findByKeyword" resultMap="BaseResultMap">
         SELECT * FROM user
         WHERE 1=1
@@ -317,9 +319,9 @@
                 OR student_id LIKE CONCAT('%', #{keyword}, '%')
             )
         </if>
-        <if test="userType != null and userType != ''">
+        <!-- <if test="userType != null and userType != ''">
             AND user_type = #{userType}
-        </if>
+        </if> -->
         <if test="status != null">
             AND status = #{status}
         </if>

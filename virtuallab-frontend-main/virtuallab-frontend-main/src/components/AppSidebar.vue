@@ -56,12 +56,22 @@ const getSectionTitle = (menuKey: string) => {
 
 <style scoped>
 .app-sidebar {
-  width: 180px;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  flex-shrink: 0 !important;
   background: #fff;
   border-right: 1px solid #e5e7eb;
   min-height: calc(100vh - 56px);
   padding: 24px 0;
   overflow-y: auto;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  left: 0 !important;
+  transform: none !important;
+  margin-left: 0 !important;
 }
 
 .sidebar-nav {
@@ -150,13 +160,18 @@ const getSectionTitle = (menuKey: string) => {
 
 @media (max-width: 768px) {
   .app-sidebar {
-    width: 200px;
-    position: fixed;
-    top: 56px; /* 顶部固定距离，与你的布局头部高度一致 */
-    left: 0;
-    height: calc(100vh - 56px); /* 视口高度减去顶部导航栏高度 */
-    z-index: 1000; /* 保证它在内容之上 */
-
+    width: 180px !important;
+    position: relative !important;
+    top: auto !important;
+    left: 0 !important;
+    height: auto !important;
+    min-height: calc(100vh - 56px);
+    z-index: auto !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    margin-left: 0 !important;
   }
   
   .nav-link span,

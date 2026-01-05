@@ -69,7 +69,20 @@ const userStore = useUserStore()
 const handleCommand = async (command: string) => {
   switch (command) {
     case 'profile':
-      router.push('/profile')
+      // 根据用户角色跳转到对应的 profile 路由
+      const role = userStore.userRole
+      if (role === 'STUDENT') {
+        router.push('/student/profile')
+      } else if (role === 'TEACHER') {
+        router.push('/teacher/profile')
+      } else if (role === 'DEPARTMENT_ADMIN') {
+        router.push('/department/profile')
+      } else if (role === 'SYSTEM_ADMIN') {
+        router.push('/admin/profile')
+      } else {
+        // 如果没有角色信息，尝试访问通用 profile
+        router.push('/profile')
+      }
       break
     case 'settings':
       ElMessage.info('系统设置功能开发中')

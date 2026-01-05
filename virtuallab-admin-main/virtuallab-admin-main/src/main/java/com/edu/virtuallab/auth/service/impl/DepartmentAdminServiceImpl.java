@@ -305,10 +305,28 @@ public class DepartmentAdminServiceImpl implements DepartmentAdminService {
     private Department getAdminDepartment(Long adminUserId) {
         User admin = userDao.findById(adminUserId);
         if (admin == null) throw new BusinessException("管理员不存在");
+        
+        String adminDepartment = admin.getDepartment();
+        if (adminDepartment == null || adminDepartment.trim().isEmpty()) {
+            throw new BusinessException(String.format("管理员[%s]的院系信息为空，请先设置所属院系", admin.getUsername()));
+        }
+        
+        // 使用trim和忽略大小写进行匹配，提高容错性
+        String trimmedDept = adminDepartment.trim();
         return departmentDao.findAll().stream()
-                .filter(d -> d.getName().equals(admin.getDepartment()))
+                .filter(d -> d.getName() != null && d.getName().trim().equalsIgnoreCase(trimmedDept))
                 .findFirst()
-                .orElseThrow(() -> new BusinessException("未找到管理员所属院系"));
+                .orElseThrow(() -> {
+                    // 提供更详细的错误信息
+                    List<String> availableDepts = departmentDao.findAll().stream()
+                            .map(Department::getName)
+                            .filter(name -> name != null && !name.trim().isEmpty())
+                            .collect(Collectors.toList());
+                    String errorMsg = String.format("未找到管理员[%s]所属院系[%s]。可用院系列表：%s", 
+                            admin.getUsername(), adminDepartment, 
+                            availableDepts.isEmpty() ? "无" : String.join(", ", availableDepts));
+                    return new BusinessException(errorMsg);
+                });
     }
 
     private void checkSameDepartment(User user, Department adminDept, String errMsg) {

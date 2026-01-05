@@ -36,6 +36,7 @@
             placeholder="选择状态"
             clearable
             class="status-filter"
+            @change="fetchProjects"
         >
           <el-option label="全部" value="all" />
           <el-option label="待审核" value="pending" />
@@ -136,7 +137,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import {
@@ -159,6 +160,12 @@ const pageSize = ref(12)
 const total = ref(0)
 const userStore = useUserStore()
 const currentUserDepartment = computed(() => userStore.userDepartment || '')
+
+// 监听状态筛选变化，自动刷新列表
+watch(filterStatus, () => {
+  currentPage.value = 1 // 重置到第一页
+  fetchProjects()
+})
 
 // 模拟项目分类
 const categories = ref([

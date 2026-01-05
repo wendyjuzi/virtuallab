@@ -106,6 +106,28 @@ const routes: RouteRecordRaw[] = [
         name: 'DepartmentLabDetail',
         component: () => import('@/views/admin/DepartmentLabDetail.vue')
       },
+      // 项目审核路由
+      {
+        path: 'project-audit',
+        name: 'DepartmentProjectAuditList',
+        component: () => import('@/views/admin/ProjectAuditList.vue')
+      },
+      {
+        path: 'project-audit/:projectId',
+        name: 'DepartmentProjectAuditDetail',
+        component: () => import('@/views/admin/ProjectAuditDetail.vue')
+      },
+      {
+        path: 'project-audit-direct/:projectId',
+        name: 'DepartmentProjectAuditDirect',
+        component: () => import('@/views/admin/ProjectAuditDirect.vue')
+      },
+      // 统计报告路由
+      {
+        path: 'reports',
+        name: 'DepartmentReports',
+        component: () => import('@/views/admin/DepartmentReports.vue')
+      },
     ]
   },
 

@@ -13,22 +13,22 @@
       <div class="left-panel">
         <div class="left-top">
           <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card" @click="navigateTo('/department/users')">
               <h3>本院系用户</h3>
               <div class="stat-number">{{ stats.departmentUsers }}</div>
               <div class="stat-label">总用户数</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" @click="navigateTo('/department/project-audit')">
               <h3>本院系项目</h3>
               <div class="stat-number">{{ stats.departmentProjects }}</div>
               <div class="stat-label">进行中项目</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" @click="navigateTo('/department/users?userType=TEACHER')">
               <h3>本院系教师</h3>
               <div class="stat-number">{{ stats.departmentTeachers }}</div>
               <div class="stat-label">教师数量</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" @click="navigateTo('/department/users?userType=STUDENT')">
               <h3>本院系学生</h3>
               <div class="stat-number">{{ stats.departmentStudents }}</div>
               <div class="stat-label">学生数量</div>
@@ -90,7 +90,7 @@
               <button class="action-btn primary" @click="addUser">添加用户</button>
               <button class="action-btn" @click="createProject">创建项目</button>
               <button class="action-btn" @click="navigateTo('/department/reports')">生成报告</button>
-              <button class="action-btn" @click="navigateTo('/admin/labReservation')">审批预约</button>
+              <button class="action-btn" @click="refreshData">刷新数据</button>
             </div>
           </div>
         </div>
@@ -150,9 +150,8 @@
                   placeholder="请选择用户类型"
                   style="width: 100%"
               >
-                <el-option label="院系管理员" value="department_admin" />
-                <el-option label="教师" value="teacher" />
-                <el-option label="学生" value="student" />
+                <el-option label="教师" value="TEACHER" />
+                <el-option label="学生" value="STUDENT" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -212,7 +211,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 // import UserFormDialog from '@/components/UserFormDialog.vue'
 import { getDepartmentUserStats } from '@/api/request' // 导入新添加的API方法
-import { createUser } from '@/api/request'
+import { createDepartmentUser } from '@/api/departmentAdmin'
 import {ElMessage} from "element-plus"
 import type { FormInstance, FormRules } from 'element-plus'
 import {reactive} from "vue"
@@ -308,25 +307,39 @@ const handleCreateUser = async () => {
 
     submitting.value = true
 
-    // 添加院系信息
-    const payload = {
-      ...userForm,
-      department: userStore.userDepartment
+    const adminUserId = userStore.user?.id
+    if (!adminUserId) {
+      ElMessage.error('无法获取管理员信息')
+      return
     }
 
-    // 调用API创建用户
-    const res = await createUser(payload)
+    // 添加院系信息，并映射用户类型
+    const payload = {
+      username: userForm.username,
+      realName: userForm.realName,
+      email: userForm.email,
+      phone: userForm.phone,
+      studentId: userForm.studentId,
+      department: userStore.userDepartment,
+      major: userForm.major,
+      userType: userForm.userType, // TEACHER 或 STUDENT
+      password: userForm.password,
+      status: userForm.status
+    }
+
+    // 调用院系管理员API创建用户
+    const res: any = await createDepartmentUser(payload, adminUserId)
     if (res.code === 200) {
       ElMessage.success('用户创建成功')
       showUserDialog.value = false
       // 刷新统计数据
       await fetchDepartmentStats()
     } else {
-      ElMessage.error('创建失败')
+      ElMessage.error(res?.message || '创建失败')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('创建用户失败:', error)
-    ElMessage.error('创建用户失败')
+    ElMessage.error(error?.message || '创建用户失败')
   } finally {
     submitting.value = false
   }
@@ -349,26 +362,31 @@ const stats = ref({
 const fetchDepartmentStats = async () => {
   try {
     const res = await getDepartmentUserStats(userStore.user?.id || 0)
-    // 调试日志
-    console.log('API响应完整结构:', res);
-    console.log('响应数据:', res.data);
-    console.log('实际数据:', res.data.data);
-    stats.value.departmentUsers = res.data.total
+    // 添加空值检查
+    if (res && res.data) {
+      stats.value.departmentUsers = res.data.total || 0
+    } else {
+      stats.value.departmentUsers = 0
+    }
 
     // 获取教师数量
     const teacherRes = await getDepartmentTeacherCount(userStore.user?.id || 0)
-    stats.value.departmentTeachers = teacherRes.data || 0
+    stats.value.departmentTeachers = (teacherRes?.data) || 0
 
     // 获取学生数量
     const studentRes = await getDepartmentStudentCount(userStore.user?.id || 0)
-    stats.value.departmentStudents = studentRes.data || 0
+    stats.value.departmentStudents = (studentRes?.data) || 0
 
     // 获取本院系项目数量
     const projectRes = await getDepartmentProjectCount(userStore.user?.id || 0)
-    stats.value.departmentProjects = projectRes.data.count // 从响应中提取count字段
+    if (projectRes && projectRes.data) {
+      stats.value.departmentProjects = projectRes.data.count || 0
+    } else {
+      stats.value.departmentProjects = 0
+    }
   } catch (error) {
     console.error('获取院系用户统计失败:', error)
-    // 可以设置默认值或显示错误信息
+    // 设置默认值
     stats.value.departmentUsers = 0
     stats.value.departmentTeachers = 0
     stats.value.departmentStudents = 0
@@ -382,10 +400,15 @@ const fetchNotifications = async () => {
   try {
     const userId = userStore.user?.id || 0
     const res = await getAllNotifications(userId)
-    // 按创建时间降序排序并取前3条
-    notifications.value = res.data
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 3)
+    // 添加空值检查，确保 res.data 是数组
+    if (res && res.data && Array.isArray(res.data)) {
+      // 按创建时间降序排序并取前3条
+      notifications.value = res.data
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 3)
+    } else {
+      notifications.value = []
+    }
   } catch (error) {
     console.error('获取通知失败:', error)
     notifications.value = []
@@ -438,6 +461,18 @@ const navigateTo = (path: string) => {
 
 const createProject = () => {
   router.push('/experiment/create')
+}
+
+// 添加刷新功能
+const refreshData = async () => {
+  try {
+    await fetchDepartmentStats()
+    await fetchNotifications()
+    ElMessage.success('数据刷新成功')
+  } catch (error) {
+    console.error('刷新数据失败:', error)
+    ElMessage.error('刷新数据失败，请稍后重试')
+  }
 }
 
 const generateReport = () => {
@@ -783,6 +818,7 @@ onMounted(async () => {  // 添加 async 关键字
   margin-bottom: 5px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

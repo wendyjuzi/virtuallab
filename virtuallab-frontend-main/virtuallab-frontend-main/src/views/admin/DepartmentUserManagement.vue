@@ -33,7 +33,14 @@
             <el-icon><Search /></el-icon>
           </template>
         </el-input>
+        <el-select v-model="searchForm.userType" placeholder="用户类型" clearable style="width: 150px">
+          <el-option label="全部" value="" />
+          <el-option label="教师" value="TEACHER" />
+          <el-option label="学生" value="STUDENT" />
+          <el-option label="院系管理员" value="DEPARTMENT_ADMIN" />
+        </el-select>
         <el-select v-model="searchForm.status" placeholder="选择状态" clearable style="width: 120px">
+          <el-option label="全部" :value="null" />
           <el-option label="正常" :value="1" />
           <el-option label="禁用" :value="0" />
           <el-option label="锁定" :value="2" />
@@ -221,6 +228,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Plus, Operation } from '@element-plus/icons-vue'
 import {
@@ -385,9 +393,19 @@ const fetchUserList = async () => {
     )
 
     if (res.code === 200) {
-      userList.value = res.data.list || []
-      pagination.total = res.data.total || 0
+      userList.value = res.data?.list || []
+      pagination.total = res.data?.total || 0
+    } else {
+      // API 返回错误时，设置空列表
+      userList.value = []
+      pagination.total = 0
+      ElMessage.warning(res?.message || '获取用户列表失败')
     }
+  } catch (error: any) {
+    console.error('获取用户列表失败:', error)
+    userList.value = []
+    pagination.total = 0
+    ElMessage.error('获取用户列表失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -616,8 +634,15 @@ const resetForm = () => {
   }
 }
 
+// 获取路由对象
+const route = useRoute()
+
 // 生命周期
 onMounted(() => {
+  // 检查路由参数，如果有userType参数则设置筛选条件
+  if (route.query.userType) {
+    searchForm.userType = route.query.userType as string
+  }
   fetchUserList()
 })
 </script>

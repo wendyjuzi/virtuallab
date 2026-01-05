@@ -178,20 +178,30 @@ export default {
       this.listQuery.department = userStore.userDepartment || undefined
 
       fetchLabList(this.listQuery).then(response => {
-        // 转换数据格式，确保字段名匹配
-        this.list = response.data.records.map(item => ({
-          id: item.labId,
-          name: item.labName,
-          code: item.labId.toString(), // 如果没有code字段，可以用labId代替
-          department: item.department,
-          location: item.location,
-          status: item.status === 'available' ? '开放' : item.status === 'maintenance' ? '维修中' : '关闭',
-          capacity: item.capacity,
-          description: item.description
-        }))
-        this.total = response.data.total
+        // 添加空值检查，防止 response.data 为 null
+        if (response && response.data) {
+          const records = response.data.records || []
+          // 转换数据格式，确保字段名匹配
+          this.list = records.map(item => ({
+            id: item.labId,
+            name: item.labName,
+            code: item.labId.toString(), // 如果没有code字段，可以用labId代替
+            department: item.department,
+            location: item.location,
+            status: item.status === 'available' ? '开放' : item.status === 'maintenance' ? '维修中' : '关闭',
+            capacity: item.capacity,
+            description: item.description
+          }))
+          this.total = response.data.total || 0
+        } else {
+          this.list = []
+          this.total = 0
+        }
         this.listLoading = false
-      }).catch(() => {
+      }).catch(error => {
+        console.error('获取实验室列表失败:', error)
+        this.list = []
+        this.total = 0
         this.listLoading = false
       })
     },
